@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
     {
         Model::unguard();
 
-        DB::table('group')->delete();
+        DB::table('groups')->delete();
         DB::table('users')->delete();
         DB::table('password_resets')->delete();
         DB::table('rules')->delete();

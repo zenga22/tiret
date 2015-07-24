@@ -22,16 +22,16 @@ quantità di files ad un gran numero di utenti.
 
 # Installazione
 
-> git clone https://github.com/OfficineDigitali/tiret
-> cd tiret
-> composer install
-> php artisan key:generate
-> php artisan migrate
-> php artisan db:seed
-> cp .env.example .env
-
-A questo punto sarà necessario editare il file .env con i propri parametri di accesso al
-database, ad S3 e per l'invio delle notifiche mail.
+```
+git clone https://github.com/OfficineDigitali/tiret
+cd tiret
+composer install
+php artisan key:generate
+cp .env.example .env
+(editare .env con i propri parametri di accesso al database, a S3 e all'SMTP)
+php artisan migrate
+php artisan db:seed
+```
 
 # Auto-Assegnazione
 
