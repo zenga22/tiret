@@ -36,7 +36,7 @@ class FileController extends Controller
                     }
 
                     if ($user->testAccess($folder))
-                        Cloud::loadFile($folder, $path);
+                        Cloud::loadFile($path, $folder, $filename);
                     else
                         abort(403);
 

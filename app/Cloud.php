@@ -23,12 +23,11 @@ class Cloud {
         $disk->deleteDirectory($folder);
     }
 
-    public static function loadFile($folder, $filepath)
+    public static function loadFile($filepath, $folder, $filename)
     {
         $disk = Storage::disk('s3');
-        $name = basename($filepath);
         $contents = file_get_contents($filepath);
-        $disk->put($folder . '/' . $name, $contents);
+        $disk->put($folder . '/' . $filename, $contents);
     }
 
     public static function readFile($folder, $filename)

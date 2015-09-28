@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Log;
 use Illuminate\Console\Command;
 use Storage;
+use App\Cloud;
 use App\Rule;
 
 class AssignFiles extends Command
@@ -20,6 +21,7 @@ class AssignFiles extends Command
     public function handle()
     {
         $disk = Storage::disk('local');
+        $storagePath  = Storage::disk('local')->getDriver()->getAdapter()->getPathPrefix();
         $files = $disk->files('/');
         $rules = Rule::get();
 
@@ -33,12 +35,10 @@ class AssignFiles extends Command
                 $target = $rule->apply($file);
                 if ($target != false) {
                     list($folder, $filename) = $target;
-
-                    if (Cloud::testExistance($folder)) {
-                        Cloud::loadFile($folder, $filename);
-                        $disk->delete($file);
-                        Log::info('Caricato in ' . $folder);
-                    }
+                    $filepath = $storagePath . '/' . $file;
+                    Cloud::loadFile($filepath, $folder, $filename);
+                    $disk->delete($file);
+                    Log::info('Caricato in ' . $folder);
                 }
             }
         }
