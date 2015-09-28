@@ -6332,5 +6332,5 @@ button.close {
 /*# sourceMappingURL=bootstrap.css.map */
 
 .filelist td {
-  word-break: break-word;
+  word-break: break-all;
 }
