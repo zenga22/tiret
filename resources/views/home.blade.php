@@ -7,7 +7,7 @@
             @if(count($files) == 0)
                 <p class="alert alert-info">Non hai files assegnati</p>
             @else
-                <table class="table">
+                <table class="table filelist">
                     <tbody>
                         @foreach($files as $file)
                             <tr>
@@ -22,7 +22,7 @@
             @if(count($groupfiles) == 0)
                 <p class="alert alert-info">Il tuo gruppo non ha files assegnati</p>
             @else
-                <table class="table">
+                <table class="table filelist">
                     <tbody>
                         @foreach($groupfiles as $file)
                             <tr>
