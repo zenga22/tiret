@@ -56,48 +56,63 @@ class AdminController extends Controller
         });
     }
 
-    public function postImport(Request $request)
+    private function importing($step, $limit)
     {
-        if ($request->file('file')->move(sys_get_temp_dir(), 'import.csv')) {
-            $path = sys_get_temp_dir() . '/' . 'import.csv';
-            $contents = file($path);
+        $path = sys_get_temp_dir() . '/' . 'import.csv';
+        $contents = file($path);
 
-            $groups = [];
-            $dbgroups = Group::get();
-            foreach($dbgroups as $g)
-                $groups[$g->name] = $g->id;
+        $groups = [];
+        $dbgroups = Group::get();
+        foreach($dbgroups as $g)
+            $groups[$g->name] = $g->id;
 
-            foreach($contents as $row) {
-                $data = str_getcsv($row);
+        for ($i = $step, $iterations = 0; $i < count($contents); $i++) {
+            $iterations++;
+            if ($iterations >= $limit)
+                return $i;
 
-                $username = $data[2];
-                $test = User::where('username', '=', $username)->first();
-                if ($test != null)
-                    continue;
+            $row = $contents[$i];
+            $data = str_getcsv($row);
 
-                $u = new User();
-                $u->name = $data[0];
-                $u->surname = $data[1];
-                $u->username = $username;
-                $u->email = $data[3];
+            $username = $data[2];
+            $test = User::where('username', '=', $username)->first();
+            if ($test != null)
+                continue;
 
-                if (isset($groups[$data[4]]))
-                    $u->group_id = $groups[$data[4]];
-                else
-                    $u->group_id = -1;
+            $u = new User();
+            $u->name = $data[0];
+            $u->surname = $data[1];
+            $u->username = $username;
+            $u->email = $data[3];
 
-                $password = str_random(10);
-                $u->password = Hash::make($password);
-                $u->save();
+            if (isset($groups[$data[4]]))
+                $u->group_id = $groups[$data[4]];
+            else
+                $u->group_id = -1;
 
-                Cloud::createFolder($u->username);
-                $this->notifyNewUser($u, $password);
+            $password = str_random(10);
+            $u->password = Hash::make($password);
+            $u->save();
 
-                usleep(500000);
-            }
+            Cloud::createFolder($u->username);
+            $this->notifyNewUser($u, $password);
+            usleep(500000);
         }
 
-        return redirect(url('admin/users'));
+        return null;
+    }
+
+    public function postImport(Request $request)
+    {
+        if ($request->hasFile('file') && $request->file('file')->move(sys_get_temp_dir(), 'import.csv'))
+            $step = $this->importing(0, 10);
+        else
+            $step = $this->importing($request->input('step'), 100);
+
+        if ($step == null)
+            return redirect(url('admin/users'));
+        else
+            return Theme::view('admin.import', ['step' => $step]);
     }
 
     public function postCreate(Request $request)

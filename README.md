@@ -26,20 +26,22 @@ quantità di files ad un gran numero di utenti.
 git clone https://github.com/OfficineDigitali/tiret
 cd tiret
 composer install
-php artisan key:generate
 cp .env.example .env
 (editare .env con i propri parametri di accesso al database, a S3 e all'SMTP)
 php artisan migrate
 php artisan db:seed
+php artisan key:generate
 ```
 
 # Auto-Assegnazione
 
 È possibile fare in modo che i files arbitrariamente caricati in _storage/app_ vengano assegnati
-ad utenti o gruppi in funzione del loro nome.
+ad utenti o gruppi in funzione del loro nome. Dal pannello "_Regole Assegnazione_" si specificano
+le proprie regular expressions, con cui estrarre il nome della cartella di destinazione.
 
-Dal pannello "_Regole Assegnazione_" si specificano le proprie regular expressions, con cui
-estrarre il nome della cartella di destinazione.
+È necessario abilitare lo scheduler interno a Laravel affinché la routine di assegnazione venga
+eseguita: per far ciò, eseguire per mezzo di cron il comando `php artisan schedule:run` ogni
+minuto.
 
 # Temi
 
