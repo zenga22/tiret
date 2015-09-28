@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use Log;
 use Illuminate\Console\Command;
 use Storage;
 use App\Rule;
@@ -26,6 +27,8 @@ class AssignFiles extends Command
             if (substr($file, 0, 1) == '.')
                 continue;
 
+            Log::info('Manipolo file ' . $file);
+
             foreach($rules as $rule) {
                 $target = $rule->apply($file);
                 if ($target != false) {
@@ -34,6 +37,7 @@ class AssignFiles extends Command
                     if (Cloud::testExistance($folder)) {
                         Cloud::loadFile($folder, $filename);
                         $disk->delete($file);
+                        Log::info('Caricato in ' . $folder);
                     }
                 }
             }
