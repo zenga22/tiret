@@ -91,7 +91,9 @@ class AdminController extends Controller
                 $u->save();
 
                 Cloud::createFolder($u->username);
-                $this->notifyNewUser($user, $password);
+                $this->notifyNewUser($u, $password);
+
+                usleep(500000);
             }
         }
 
