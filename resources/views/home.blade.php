@@ -1,6 +1,10 @@
 @extends($theme_layout)
 
 @section('content')
+<ol class="breadcrumb">
+    <li class="pull-right"><a href="{{ url('/auth/logout') }}">Logout</a></li>
+</ol>
+
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-12">

@@ -5,6 +5,7 @@
     <li><a href="{{ url('admin') }}">Pannello Amministrazione</a></li>
     <li><a href="{{ url('admin/users') }}">Utenti</a></li>
     <li class="active">Importazione</li>
+    <li class="pull-right"><a href="{{ url('/auth/logout') }}">Logout</a></li>
 </ol>
 
 <div class="container-fluid">

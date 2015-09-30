@@ -4,6 +4,7 @@
 <ol class="breadcrumb">
     <li><a href="{{ url('admin') }}">Pannello Amministrazione</a></li>
     <li class="active">Gruppi</li>
+    <li class="pull-right"><a href="{{ url('/auth/logout') }}">Logout</a></li>
 </ol>
 
 <div class="container-fluid">

@@ -3,6 +3,7 @@
 @section('content')
 <ol class="breadcrumb">
     <li class="active">Pannello Amministrazione</li>
+    <li class="pull-right"><a href="{{ url('/auth/logout') }}">Logout</a></li>
 </ol>
 
 <div class="container-fluid">
