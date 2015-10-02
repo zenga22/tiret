@@ -35,4 +35,8 @@ return [
         'secret' => '',
     ],
 
+    'emergency_mail' => [
+        'url' => 'http://mydomain.it/myscript.php'
+    ]
+
 ];

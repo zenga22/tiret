@@ -51,9 +51,14 @@ class AdminController extends Controller
 
     private function notifyNewUser($user, $password)
     {
-        Mail::send('emails.creation', ['user' => $user, 'password' => $password], function ($m) use ($user) {
-            $m->to($user->email, $user->name . ' ' . $user->surname)->subject('nuovo account accesso files');
-        });
+        try {
+            Mail::send('emails.creation', ['user' => $user, 'password' => $password], function ($m) use ($user) {
+                $m->to($user->email, $user->name . ' ' . $user->surname)->subject('nuovo account accesso files');
+            });
+        }
+        catch(\Swift_TransportException $e) {
+            Log::info('Failed mail to ' . $user->email);
+        }
     }
 
     private function importing($step, $limit)
@@ -74,27 +79,43 @@ class AdminController extends Controller
             $row = $contents[$i];
             $data = str_getcsv($row);
 
-            $username = $data[2];
-            $test = User::where('username', '=', $username)->first();
-            if ($test != null)
-                continue;
+            if (count($data) == 1) {
+                $mail = $data[0];
+                $test = User::where('email', '=', $mail)->first();
+                if ($test == null) {
+                    Log::info('Missing user ' . $mail);
+                }
+                else {
+                    $u = $test;
+                    $password = str_random(10);
+                    $u->password = Hash::make($password);
+                    $u->save();
+                }
+            }
+            else {
+                $username = $data[2];
+                $test = User::where('username', '=', $username)->first();
+                if ($test != null)
+                    continue;
 
-            $u = new User();
-            $u->name = $data[0];
-            $u->surname = $data[1];
-            $u->username = $username;
-            $u->email = $data[3];
+                $u = new User();
+                $u->name = $data[0];
+                $u->surname = $data[1];
+                $u->username = $username;
+                $u->email = $data[3];
 
-            if (isset($groups[$data[4]]))
-                $u->group_id = $groups[$data[4]];
-            else
-                $u->group_id = -1;
+                if (isset($groups[$data[4]]))
+                    $u->group_id = $groups[$data[4]];
+                else
+                    $u->group_id = -1;
 
-            $password = str_random(10);
-            $u->password = Hash::make($password);
-            $u->save();
+                $password = str_random(10);
+                $u->password = Hash::make($password);
+                $u->save();
 
-            Cloud::createFolder($u->username);
+                Cloud::createFolder($u->username);
+            }
+
             $this->notifyNewUser($u, $password);
             usleep(500000);
         }

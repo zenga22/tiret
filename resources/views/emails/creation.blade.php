@@ -1,7 +1,13 @@
-Gentile {{ $user->name }} {{ $user->surname }},
+<p>
+    Gentile {{ $user->name }} {{ $user->surname }},
+</p>
 
-è stato creato per lei un nuovo account su {{ url('/') }} con cui potrà accedere ai suoi files.
+<p>
+    è stato creato per lei un nuovo account su {{ url('/') }} con cui potrà accedere ai suoi files.
+</p>
 
-Le credenziali per accedere sono
-username: {{ $user->username }}
-password: {{ $password }}
+<p>
+    Le credenziali per accedere sono<br/>
+    username: {{ $user->username }}<br/>
+    password: {{ $password }}<br/>
+</p>
