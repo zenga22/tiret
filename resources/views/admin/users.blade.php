@@ -15,7 +15,13 @@
         </div>
 
         <div class="col-md-8 contents">
-            <table class="table">
+            <div class="row">
+                <div class="col-md-12">
+                    <input type="text" class="form-control" id="textfilter" autocomplete="off" placeholder="Cerca...">
+                </div>
+            </div>
+
+            <table class="table filteratable">
                 <thead>
                     <tr>
                         <th>Nome e Mail</th>
@@ -29,7 +35,7 @@
                     @foreach($users as $user)
                     <tr>
                         <td>
-                            {{ $user->name }} {{ $user->surname }}<br/>
+                            {{ $user->surname }} {{ $user->name }}<br/>
                             {{ $user->email }}
                         </td>
                         <td>{{ $user->username }}</td>

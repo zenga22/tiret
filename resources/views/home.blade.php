@@ -8,7 +8,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-12">
-            <input type="text" class="form-control" id="textfilter" autocomplete="off" placeholder="Filtra">
+            <input type="text" class="form-control" id="textfilter" autocomplete="off" placeholder="Cerca...">
         </div>
     </div>
 
@@ -17,7 +17,7 @@
             @if(count($files) == 0)
                 <p class="alert alert-info">Non hai files assegnati</p>
             @else
-                <table class="table filelist">
+                <table class="table filelist filteratable">
                     <tbody>
                         @foreach($files as $file)
                             <tr>
@@ -32,7 +32,7 @@
             @if(count($groupfiles) == 0)
                 <p class="alert alert-info">Il tuo gruppo non ha files assegnati</p>
             @else
-                <table class="table filelist">
+                <table class="table filelist filteratable">
                     <tbody>
                         @foreach($groupfiles as $file)
                             <tr>

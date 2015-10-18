@@ -11,11 +11,11 @@ $(document).ready(function() {
         var t = $(this).val().toLowerCase();
 
         if (t == '') {
-            $('.filelist td').show();
+            $('.filteratable tbody tr').show();
         }
         else {
-            $('.filelist td').each(function() {
-                var a = $(this).find('a').text().toLowerCase();
+            $('.filteratable tbody tr').each(function() {
+                var a = $(this).find('td').text().toLowerCase();
                 if (a.indexOf(t) == -1)
                     $(this).hide();
                 else
