@@ -343,4 +343,11 @@ class AdminController extends Controller
             abort(403);
         }
     }
+
+    public function getCount(Request $request)
+    {
+        $folder = $request->input('folder');
+        $files = Cloud::getContents($folder);
+        return count($files);
+    }
 }

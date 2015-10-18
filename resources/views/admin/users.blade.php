@@ -28,6 +28,7 @@
                         <th>Username</th>
                         <th>Ultimo Accesso</th>
                         <th>Stato</th>
+                        <th>Files</th>
                         <th>&nbsp;</th>
                     </tr>
                 </thead>
@@ -45,6 +46,7 @@
                             <span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span>
                             @endif
                         </td>
+                        <td><img src="{{ url('/img/spinner.gif') }}" class="waiting-count" id="{{ $user->username }}"></td>
                         <td class="text-right"><a class="btn btn-default" href="{{ url('admin/show/' . $user->id) }}">Modifica</a></td>
                     </tr>
                     @endforeach
