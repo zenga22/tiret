@@ -41,6 +41,8 @@ class AssignFiles extends Command
                     Log::info('Caricato in ' . $folder);
                 }
             }
+
+            usleep(500000);
         }
     }
 }

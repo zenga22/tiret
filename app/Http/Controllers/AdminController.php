@@ -56,7 +56,7 @@ class AdminController extends Controller
                 $m->to($user->email, $user->name . ' ' . $user->surname)->subject('nuovo account accesso files');
             });
         }
-        catch(\Swift_TransportException $e) {
+        catch(\Exception $e) {
             Log::info('Failed mail to ' . $user->email);
         }
     }
@@ -117,7 +117,7 @@ class AdminController extends Controller
             }
 
             $this->notifyNewUser($u, $password);
-            usleep(500000);
+            sleep(1);
         }
 
         return null;
