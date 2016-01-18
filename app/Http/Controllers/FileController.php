@@ -26,8 +26,8 @@ class FileController extends Controller
 
                     if ($request->has('user_id')) {
                         $target = User::findOrFail($request->input('user_id'));
-                        $folder = $user->username;
-                        $ret = redirect(url('admin/show/' . $user->id));
+                        $folder = $target->username;
+                        $ret = redirect(url('admin/show/' . $target->id));
                     }
                     else if ($request->has('group_id')) {
                         $group = Group::findOrFail($request->input('group_id'));
