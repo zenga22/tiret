@@ -33,6 +33,8 @@ php artisan db:seed
 php artisan key:generate
 ```
 
+Le credenziali di default sono username: admin, password: cippalippa
+
 # Auto-Assegnazione
 
 È possibile fare in modo che i files arbitrariamente caricati in _storage/app_ vengano assegnati
