@@ -17,6 +17,7 @@ use Session;
 use Hash;
 use Theme;
 use Mail;
+use Log;
 
 class AdminController extends Controller
 {
