@@ -345,9 +345,8 @@ class AdminController extends Controller
         }
     }
 
-    public function getCount(Request $request)
+    public function getCount(Request $request, $folder)
     {
-        $folder = $request->input('folder');
         $files = Cloud::getContents($folder);
         return count($files);
     }

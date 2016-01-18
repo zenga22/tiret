@@ -27,7 +27,7 @@ $(document).ready(function() {
     $('.waiting-count').each(function() {
         var folder = $(this).attr('id');
         var img = $(this);
-        $.get('/admin/count', {folder: folder}, function(c) {
+        $.get('/admin/count/' + folder, function(c) {
             img.parent().append('<span>' + c + '</span>');
             img.remove();
         });
