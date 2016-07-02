@@ -27,24 +27,26 @@ $(document).ready(function() {
     var index = 0;
     var tot = $('.waiting-count').length;
 
-    setInterval(function() {
-        var row = $('.waiting-count').eq(index);
-        var folder = row.attr('id');
+    if($('.waiting-count').length != 0) {
+        setInterval(function() {
+            var row = $('.waiting-count').eq(index);
+            var folder = row.attr('id');
 
-        $.ajax('http://files.nuovacollaborazione.it/admin/count/' + folder, {
-            method: 'GET',
-            dataType: 'HTML',
-            success: function(c, status, request) {
-                var id = request.getResponseHeader('Folder-ID');
-                var target = $('.waiting-count[id=' + id + ']');
-                target.parent().append('<span>' + c + '</span>');
-                target.remove();
-            }
-        });
+            $.ajax('http://files.nuovacollaborazione.it/admin/count/' + folder, {
+                method: 'GET',
+                dataType: 'HTML',
+                success: function(c, status, request) {
+                    var id = request.getResponseHeader('Folder-ID');
+                    var target = $('.waiting-count[id=' + id + ']');
+                    target.parent().append('<span>' + c + '</span>');
+                    target.remove();
+                }
+            });
 
-        index++;
-        if (index >= tot)
-            return false;
+            index++;
+            if (index >= tot)
+                return false;
 
-    }, 200);
+        }, 200);
+    }
 });
