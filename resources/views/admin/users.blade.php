@@ -10,12 +10,12 @@
 
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-4 options">
+        <div class="col-md-3 options">
             <button type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#createUser">Aggiungi Utente</button>
             <button type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#importCSV">Importa CSV Utenti</button>
         </div>
 
-        <div class="col-md-8 contents">
+        <div class="col-md-9 contents">
             <div class="row">
                 <div class="col-md-12">
                     <input type="text" class="form-control" id="textfilter" autocomplete="off" placeholder="Cerca...">
