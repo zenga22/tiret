@@ -58,9 +58,12 @@ class Swift_EmergencyTransport implements \Swift_Transport
 
     public function send(Swift_Mime_Message $message, &$failedRecipients = null)
     {
+        $to = array_keys($message->getTo());
+        $to = $to[0];
+
         $data = [
             'subject' => $message->getSubject(),
-            'to' => array_keys($message->getTo()),
+            'to' => $to,
             'message' => (string) $message
         ];
         $options = ['form_params' => $data];
