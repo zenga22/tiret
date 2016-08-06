@@ -2,11 +2,15 @@
 
 namespace App\Console\Commands;
 
-use Log;
 use Illuminate\Console\Command;
+
 use Storage;
+use Mail;
+use Log;
+
 use App\Cloud;
 use App\Rule;
+use App\User;
 
 class AssignFiles extends Command
 {
@@ -21,7 +25,7 @@ class AssignFiles extends Command
     public function handle()
     {
         $disk = Storage::disk('local');
-        $storagePath  = Storage::disk('local')->getDriver()->getAdapter()->getPathPrefix();
+        $storagePath = Storage::disk('local')->getDriver()->getAdapter()->getPathPrefix();
         $files = $disk->files('/');
         $rules = Rule::get();
 
@@ -37,6 +41,17 @@ class AssignFiles extends Command
                     list($folder, $filename) = $target;
                     $filepath = $storagePath . '/' . $file;
                     Cloud::loadFile($filepath, $folder, $filename);
+
+                    if(env('SEND_MAIL', false) == true) {
+                        $user = User::where('username', '=', $folder)->first();
+                        if ($user != null) {
+                            Mail::send('emails.notify', ['text' => $user->group->mailtext], function ($m) use ($user, $filepath) {
+                                $m->attach($filepath);
+                                $m->to($user->email, $user->name . ' ' . $user->surname)->subject('nuovo documento disponibile');
+                            });
+                        }
+                    }
+
                     $disk->delete($file);
                     Log::info('Caricato in ' . $folder);
                 }

@@ -94,13 +94,25 @@
                     @foreach($groups as $group)
                     <div class="form-group">
                         <input type="hidden" name="ids[]" value="{{ $group->id }}">
-                        <label for="">{{ $group->name }}</label>
-                        <input type="text" class="form-control" name="names[]" value="{{ $group->name }}">
-                        <input type="checkbox" name="delete_{{ $group->id }}"> Elimina
+
+                        <div class="form-group">
+                            <label for="names[]">{{ $group->name }}</label>
+                            <input type="text" class="form-control" name="names[]" value="{{ $group->name }}">
+                        </div>
+
+                        @if(env('SEND_MAIL', false) == true)
+                        <div class="form-group">
+                            <label for="mailtext[]">Testo mail di notifica da inviare ai membri di questo gruppo</label>
+                            <textarea class="form-control" name="mailtext[]">{{ $group->mailtext }}</textarea>
+                        </div>
+                        @endif
+
+                        <input type="checkbox" name="delete_{{ $group->id }}"> Elimina Gruppo {{ $group->name }}
                     </div>
-                    @endforeach
 
                     <hr />
+
+                    @endforeach
 
                     <div class="form-group">
                         <label for="newgroup">Nuovo Gruppo</label>
