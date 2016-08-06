@@ -32,7 +32,7 @@ $(document).ready(function() {
             var row = $('.waiting-count').eq(index);
             var folder = row.attr('id');
 
-            $.ajax('http://files.nuovacollaborazione.it/admin/count/' + folder, {
+            $.ajax('/admin/count/' + folder, {
                 method: 'GET',
                 dataType: 'HTML',
                 success: function(c, status, request) {

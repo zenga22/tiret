@@ -5,10 +5,25 @@ use League\Flysystem\AwsS3v3\AwsS3Adapter;
 
 class Cloud {
 
-    public static function getContents($folder)
+    public static function getContents($folder, $sort = false)
     {
         $disk = Storage::disk('s3');
-        return $disk->files($folder);
+        $files = $disk->files($folder);
+
+        if ($sort == true) {
+            $sorting = [];
+
+            foreach($files as $file) {
+                $date = $disk->lastModified($file);
+                $sorting[$date] = $file;
+            }
+
+            krsort($sorting);
+            return $sorting;
+        }
+        else {
+            return $files;
+        }
     }
 
     public static function createFolder($folder)

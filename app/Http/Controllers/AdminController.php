@@ -36,18 +36,30 @@ class AdminController extends Controller
         return Theme::view('admin.panel');
     }
 
-    public function getUsers()
+    public function getUsers(Request $request)
     {
         $user = Auth::user();
 
         $data['groups'] = Group::get();
 
-        if ($user->is('admin'))
-            $data['users'] = User::orderBy('surname', 'asc')->get();
-        else if ($user->is('groupadmin'))
-            $data['users'] = User::where('group_id', '=', $user->group_id)->orderBy('surname', 'asc')->get();
+        if ($request->has('group')) {
+            $group_id = $request->input('group');
+            if ($user->is('admin') == false && ($user->is('groupadmin') && $group_id != $user->group_id))
+                abort(403);
 
-        return Theme::view('admin.users', $data);
+            $currentgroup = Group::find($group_id);
+            $data['currentgroup'] = $currentgroup;
+            $data['users'] = $currentgroup->users;
+            return Theme::view('admin.users', $data);
+        }
+        else {
+            if ($user->is('groupadmin'))
+                $data['groups'] = [Group::find($user->group_id)];
+            else if ($user->is('admin'))
+                $data['groups'] = Group::get();
+
+            return Theme::view('admin.gusers', $data);
+        }
     }
 
     private function notifyNewUser($user, $password)
@@ -178,7 +190,7 @@ class AdminController extends Controller
 
         if ($user->testAccess($target->username)) {
             $data['user'] = $target;
-            $data['files'] = Cloud::getContents($target->username);
+            $data['files'] = Cloud::getContents($target->username, true);
             $data['groups'] = Group::get();
             return Theme::view('admin.display', $data);
         }
@@ -254,7 +266,7 @@ class AdminController extends Controller
             $groups = [Group::find($user->group_id)];
 
         foreach($groups as $group)
-            $files[$group->name] = Cloud::getContents($group->name);
+            $files[$group->name] = Cloud::getContents($group->name, true);
 
         $data['groups'] = $groups;
         $data['files'] = $files;
@@ -347,7 +359,7 @@ class AdminController extends Controller
 
     public function getCount(Request $request, $folder)
     {
-        $files = Cloud::getContents($folder);
+        $files = Cloud::getContents($folder, false);
         header('Folder-ID: ' . $folder);
         return count($files);
     }

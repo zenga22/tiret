@@ -3,7 +3,8 @@
 @section('content')
 <ol class="breadcrumb">
     <li><a href="{{ url('admin') }}">Pannello Amministrazione</a></li>
-    <li class="active">Utenti</li>
+    <li><a href="{{ url('admin/users') }}">Utenti</a></li>
+    <li class="active">{{ $currentgroup->name }}</li>
     <li class="pull-right"><a href="{{ url('/auth/logout') }}">Logout</a></li>
 </ol>
 
