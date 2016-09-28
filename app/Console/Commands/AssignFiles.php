@@ -30,33 +30,38 @@ class AssignFiles extends Command
         $rules = Rule::get();
 
         foreach($files as $file) {
-            if (substr($file, 0, 1) == '.')
-                continue;
+            try {
+                if (substr($file, 0, 1) == '.')
+                    continue;
 
-            Log::info('Manipolo file ' . $file);
+                Log::info('Manipolo file ' . $file);
 
-            foreach($rules as $rule) {
-                $target = $rule->apply($file);
-                if ($target != false) {
-                    list($folder, $filename) = $target;
-                    $filepath = $storagePath . $file;
-                    Cloud::loadFile($filepath, $folder, $filename);
+                foreach($rules as $rule) {
+                    $target = $rule->apply($file);
+                    if ($target != false) {
+                        list($folder, $filename) = $target;
+                        $filepath = $storagePath . $file;
+                        Cloud::loadFile($filepath, $folder, $filename);
 
-                    if(env('SEND_MAIL', false) == true) {
-                        $user = User::where('username', '=', $folder)->first();
-                        if ($user != null) {
-                            Mail::send('emails.notify', ['text' => $user->group->mailtext], function ($m) use ($user, $filepath) {
-                                $m->to($user->email, $user->name . ' ' . $user->surname)->subject('nuovo documento disponibile');
-                                $m->attach($filepath);
-                            });
+                        if(env('SEND_MAIL', false) == true) {
+                            $user = User::where('username', '=', $folder)->first();
+                            if ($user != null) {
+                                Mail::send('emails.notify', ['text' => $user->group->mailtext], function ($m) use ($user, $filepath) {
+                                    $m->to($user->email, $user->name . ' ' . $user->surname)->subject('nuovo documento disponibile');
+                                    $m->attach($filepath);
+                                });
 
-                            Log::info('Inviata mail a ' . $user->name . ' ' . $user->surname);
+                                Log::info('Inviata mail a ' . $user->name . ' ' . $user->surname);
+                            }
                         }
-                    }
 
-                    $disk->delete($file);
-                    Log::info('Caricato in ' . $folder);
+                        $disk->delete($file);
+                        Log::info('Caricato in ' . $folder);
+                    }
                 }
+            }
+            catch(\Exception $e) {
+                Log::error('Errore con file ' . $file . ': ' . $e->message());
             }
 
             usleep(500000);
