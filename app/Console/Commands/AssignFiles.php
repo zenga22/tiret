@@ -61,7 +61,7 @@ class AssignFiles extends Command
                 }
             }
             catch(\Exception $e) {
-                Log::error('Errore con file ' . $file . ': ' . $e->message());
+                Log::error('Errore con file ' . $file . ': ' . $e->getMessage());
             }
 
             usleep(500000);
