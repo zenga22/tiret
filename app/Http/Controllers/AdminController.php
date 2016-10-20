@@ -104,6 +104,8 @@ class AdminController extends Controller
                     $u->password = Hash::make($password);
                     $u->save();
                 }
+
+                continue;
             }
             else {
                 $username = $data[2];
