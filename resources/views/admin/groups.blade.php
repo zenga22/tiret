@@ -107,6 +107,11 @@
                         </div>
                         @endif
 
+                        <div class="form-group">
+                            <label for="message[]">Testo di segnalazione da visualizzare per gli utenti del gruppo</label>
+                            <textarea class="form-control" name="message[]">{{ $group->message }}</textarea>
+                        </div>
+
                         <input type="checkbox" name="delete_{{ $group->id }}"> Elimina Gruppo {{ $group->name }}
                     </div>
 

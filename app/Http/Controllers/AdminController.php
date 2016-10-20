@@ -282,6 +282,7 @@ class AdminController extends Controller
             $ids = $request->input('ids');
             $names = $request->input('names');
             $mailtexts = $request->input('mailtext', []);
+            $messages = $request->input('message', []);
 
             for ($i = 0; $i < count($ids); $i++) {
                 $id = $ids[$i];
@@ -294,6 +295,7 @@ class AdminController extends Controller
                 else {
                     $group->name = $names[$i];
                     $group->mailtext = isset($mailtexts[$i]) ? $mailtexts[$i] : '';
+                    $group->message = isset($messages[$i]) ? $messages[$i] : '';
                     $group->save();
                 }
             }

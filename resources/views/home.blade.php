@@ -6,6 +6,16 @@
 </ol>
 
 <div class="container-fluid">
+    @if(!empty($user->group->message))
+    <div class="row">
+        <div class="col-md-12">
+            <div class="alert alert-warning">
+                {{ $user->group->message }}
+            </div>
+        </div>
+    </div>
+    @endif
+
     <div class="row">
         <div class="col-md-12">
             <input type="text" class="form-control" id="textfilter" autocomplete="off" placeholder="Cerca...">

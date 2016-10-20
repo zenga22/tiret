@@ -30,6 +30,7 @@ class HomeController extends Controller
             return redirect(url('admin'));
         }
         else {
+            $data['user'] = $user;
             $data['files'] = Cloud::getContents($user->username);
             $data['groupfiles'] = Cloud::getContents($user->group->name);
             return Theme::view('home', $data);
