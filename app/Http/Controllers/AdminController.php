@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
+use Bican\Roles\Models\Role;
+
 use Auth;
 use App\User;
 use App\Group;
@@ -175,7 +177,7 @@ class AdminController extends Controller
 
             $role = $request->input('admin');
             if ($role != 'none')
-                $user->attachRole($role);
+                $user->attachRole(Role::where('slug', '=', $role)->first());
 
             Cloud::createFolder($username);
             $this->notifyNewUser($user, $password);
@@ -201,7 +203,7 @@ class AdminController extends Controller
             return Theme::view('admin.display', $data);
         }
         else {
-            abort(403);
+            return redirect(url('admin/users/'));
         }
     }
 
@@ -219,6 +221,22 @@ class AdminController extends Controller
         $password = $request->input('password');
         if ($password != '')
             $user->password = Hash::make($password);
+
+        $role = $request->input('admin');
+
+        if ($user->is('admin'))
+            $current_role = 'admin';
+        else if ($user->is('groupadmin'))
+            $current_role = 'groupadmin';
+        else
+            $current_role = 'none';
+            
+        if ($role != $current_role) {
+            if ($current_role != 'none')
+                $user->detachRole(Role::where('slug', '=', $current_role)->first());
+            if ($role != 'none')
+                $user->attachRole(Role::where('slug', '=', $role)->first());
+        }
 
         $user->save();
         return redirect(url('admin/show/' . $id));
