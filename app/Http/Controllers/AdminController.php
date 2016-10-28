@@ -171,7 +171,7 @@ class AdminController extends Controller
 
             $role = $request->input('admin');
             if ($role != 'none')
-                $u->attachRole($role);
+                $user->attachRole($role);
 
             Cloud::createFolder($username);
             $this->notifyNewUser($user, $password);
