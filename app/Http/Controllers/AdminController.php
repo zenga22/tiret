@@ -64,13 +64,15 @@ class AdminController extends Controller
 
     private function notifyNewUser($user, $password)
     {
-        try {
-            Mail::send('emails.creation', ['user' => $user, 'password' => $password], function ($m) use ($user) {
-                $m->to($user->email, $user->name . ' ' . $user->surname)->subject('nuovo account accesso files');
-            });
-        }
-        catch(\Exception $e) {
-            Log::info('Failed mail to ' . $user->email);
+        foreach($user->emails as $e) {
+            try {
+                Mail::send('emails.creation', ['user' => $user, 'password' => $password], function ($m) use ($user, $e) {
+                    $m->to($e, $user->name . ' ' . $user->surname)->subject('nuovo account accesso files');
+                });
+            }
+            catch(\Exception $e) {
+                Log::info('Failed notification mail to ' . $e);
+            }
         }
     }
 
@@ -162,6 +164,8 @@ class AdminController extends Controller
             $user->surname = $request->input('surname');
             $user->username = $username;
             $user->email = $request->input('email');
+            $user->email2 = $request->input('email2');
+            $user->email3 = $request->input('email3');
             $user->group_id = $request->input('group');
 
             $password = $request->input('password');
@@ -208,6 +212,8 @@ class AdminController extends Controller
         $user->surname = $request->input('surname');
         $user->username = $request->input('username');
         $user->email = $request->input('email');
+        $user->email2 = $request->input('email2');
+        $user->email3 = $request->input('email3');
         $user->group_id = $request->input('group');
 
         $password = $request->input('password');

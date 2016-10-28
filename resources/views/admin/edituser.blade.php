@@ -22,8 +22,10 @@
                         <input type="text" class="form-control" name="username" value="<?php if($user != null) echo $user->username ?>">
                     </div>
                     <div class="form-group">
-                        <label for="email">Indirizzo Mail</label>
+                        <label for="email">Indirizzi Mail</label>
                         <input type="email" class="form-control" name="email" value="<?php if($user != null) echo $user->email ?>">
+                        <input type="email" class="form-control" name="email2" value="<?php if($user != null) echo $user->email2 ?>">
+                        <input type="email" class="form-control" name="email3" value="<?php if($user != null) echo $user->email3 ?>">
                     </div>
                     <div class="form-group">
                         <label for="password">Password</label>

@@ -42,6 +42,20 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         return $this->belongsTo('App\Group');
     }
 
+    public function getEmailsAttribute()
+    {
+        $ret = [];
+
+        if (!empty($user->email))
+            $ret[] = $user->email;
+        if (!empty($user->email2))
+            $ret[] = $user->email2;
+        if (!empty($user->email3))
+            $ret[] = $user->email3;
+
+        return $ret;
+    }
+
     public function testAccess($folder)
     {
         if ($this->username == $folder)

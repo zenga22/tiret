@@ -46,12 +46,20 @@ class AssignFiles extends Command
                         if(env('SEND_MAIL', false) == true) {
                             $user = User::where('username', '=', $folder)->first();
                             if ($user != null) {
-                                Mail::send('emails.notify', ['text' => $user->group->mailtext], function ($m) use ($user, $filepath) {
-                                    $m->to($user->email, $user->name . ' ' . $user->surname)->subject('nuovo documento disponibile');
-                                    $m->attach($filepath);
-                                });
+                                foreach($user->emails as $e) {
+                                    Mail::send('emails.notify', ['text' => $user->group->mailtext], function ($m) use ($user, $filepath, $e) {
+                                        $m->to($e, $user->name . ' ' . $user->surname)->subject('nuovo documento disponibile');
+                                        $m->attach($filepath);
+                                    });
+                                }
 
                                 Log::info('Inviata mail a ' . $user->name . ' ' . $user->surname);
+                            }
+                            else {
+                                $user = new User();
+                                $user->username = $folder;
+                                $user->save();
+                                Log::info('Creato nuovo utente ' . $user->username);
                             }
                         }
 
