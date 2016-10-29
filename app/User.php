@@ -46,12 +46,12 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
     {
         $ret = [];
 
-        if (!empty($user->email))
-            $ret[] = $user->email;
-        if (!empty($user->email2))
-            $ret[] = $user->email2;
-        if (!empty($user->email3))
-            $ret[] = $user->email3;
+        if (!empty($this->email))
+            $ret[] = $this->email;
+        if (!empty($this->email2))
+            $ret[] = $this->email2;
+        if (!empty($this->email3))
+            $ret[] = $this->email3;
 
         return $ret;
     }

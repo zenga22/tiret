@@ -9,7 +9,8 @@ class Kernel extends ConsoleKernel
 {
     protected $commands = [
         \App\Console\Commands\AssignFiles::class,
-        \App\Console\Commands\MassiveRemove::class
+        \App\Console\Commands\MassiveRemove::class,
+        \App\Console\Commands\SendAll::class,
     ];
 
     protected function schedule(Schedule $schedule)
