@@ -16,6 +16,7 @@ class AssignFiles extends Command
 {
     protected $signature = 'assignfiles';
     protected $description = '';
+    protected $keep_duplicates = true;
 
     public function __construct()
     {
@@ -40,14 +41,19 @@ class AssignFiles extends Command
                     $target = $rule->apply($file);
                     if ($target != false) {
                         list($folder, $filename) = $target;
+                        $filepath = $storagePath . $file;
 
                         if (Cloud::testExistance($folder . '/' . $filename)) {
                             Log::info('File ' . $file . ' già caricato, salto');
-                            $disk->delete($file);
+
+                            if ($this->keep_duplicates)
+                                rename($filepath, sys_get_temp_dir() . '/' . $filename);
+                            else
+                                $disk->delete($file);
+
                             break;
                         }
 
-                        $filepath = $storagePath . $file;
                         Cloud::loadFile($filepath, $folder, $filename);
                         Log::info('Caricato ' . $file . ' in ' . $folder);
 
