@@ -40,8 +40,16 @@ class AssignFiles extends Command
                     $target = $rule->apply($file);
                     if ($target != false) {
                         list($folder, $filename) = $target;
+
+                        if (Cloud::testExistance($folder . '/' . $filename)) {
+                            Log::info('File ' . $file . ' già caricato, salto');
+                            $disk->delete($file);
+                            break;
+                        }
+
                         $filepath = $storagePath . $file;
                         Cloud::loadFile($filepath, $folder, $filename);
+                        Log::info('Caricato ' . $file . ' in ' . $folder);
 
                         if(env('SEND_MAIL', false) == true) {
                             $user = User::where('username', '=', $folder)->first();
@@ -51,9 +59,9 @@ class AssignFiles extends Command
                                         $m->to($e, $user->name . ' ' . $user->surname)->subject('nuovo documento disponibile');
                                         $m->attach($filepath);
                                     });
-                                }
 
-                                Log::info('Inviata mail a ' . $user->name . ' ' . $user->surname);
+                                    Log::info('Inviata mail a ' . $user->name . ' ' . $user->surname . ' ' . $e);
+                                }
                             }
                             else {
                                 $user = new User();
@@ -64,7 +72,7 @@ class AssignFiles extends Command
                         }
 
                         $disk->delete($file);
-                        Log::info('Caricato in ' . $folder);
+                        break;
                     }
                 }
             }
