@@ -17,6 +17,7 @@ class AssignFiles extends Command
     protected $signature = 'assignfiles';
     protected $description = '';
     protected $keep_duplicates = true;
+    protected $dry_run = false;
 
     public function __construct()
     {
@@ -46,38 +47,48 @@ class AssignFiles extends Command
                         if (Cloud::testExistance($folder . '/' . $filename)) {
                             Log::info('File ' . $file . ' già caricato, salto');
 
-                            if ($this->keep_duplicates)
-                                rename($filepath, sys_get_temp_dir() . '/' . $filename);
-                            else
-                                $disk->delete($file);
+                            if ($this->dry_run == false) {
+                                if ($this->keep_duplicates)
+                                    rename($filepath, sys_get_temp_dir() . '/' . $filename);
+                                else
+                                    $disk->delete($file);
+                            }
 
                             break;
                         }
 
-                        Cloud::loadFile($filepath, $folder, $filename);
+                        if ($this->dry_run == false)
+                            Cloud::loadFile($filepath, $folder, $filename);
                         Log::info('Caricato ' . $file . ' in ' . $folder);
 
                         if(env('SEND_MAIL', false) == true) {
                             $user = User::where('username', '=', $folder)->first();
                             if ($user != null) {
                                 foreach($user->emails as $e) {
-                                    Mail::send('emails.notify', ['text' => $user->group->mailtext], function ($m) use ($user, $filepath, $e) {
-                                        $m->to($e, $user->name . ' ' . $user->surname)->subject('nuovo documento disponibile');
-                                        $m->attach($filepath);
-                                    });
+                                    if ($this->dry_run == false) {
+                                        Mail::send('emails.notify', ['text' => $user->group->mailtext], function ($m) use ($user, $filepath, $e) {
+                                            $m->to($e, $user->name . ' ' . $user->surname)->subject('nuovo documento disponibile');
+                                            $m->attach($filepath);
+                                        });
+                                    }
 
                                     Log::info('Inviata mail a ' . $user->name . ' ' . $user->surname . ' ' . $e);
                                 }
                             }
                             else {
-                                $user = new User();
-                                $user->username = $folder;
-                                $user->save();
+                                if ($this->dry_run == false) {
+                                    $user = new User();
+                                    $user->username = $folder;
+                                    $user->save();
+                                }
+
                                 Log::info('Creato nuovo utente ' . $user->username);
                             }
                         }
 
-                        $disk->delete($file);
+                        if ($this->dry_run == false)
+                            $disk->delete($file);
+
                         break;
                     }
                 }
@@ -86,7 +97,8 @@ class AssignFiles extends Command
                 Log::error('Errore con file ' . $file . ': ' . $e->getMessage());
             }
 
-            usleep(500000);
+            if ($this->dry_run == false)
+                usleep(500000);
         }
     }
 }
