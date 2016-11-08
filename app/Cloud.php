@@ -60,7 +60,24 @@ class Cloud {
     public static function testExistance($name)
     {
         $disk = Storage::disk('s3');
-        return $disk->exists($name);
-    }
+        $pattern = env('MATCHING_RULE', '');
 
+        if (empty($pattern)) {
+            return $disk->exists($name);
+        }
+        else {
+            $folder = dirname($name);
+            $filename = basename($name);
+            $filename = preg_replace($pattern, 'X', $filename);
+            $contents = Cloud::getContents($folder);
+
+            foreach($contents as $c) {
+                $c = preg_replace($pattern, 'X', $c);
+                if ($c == $filename)
+                    return true;
+            }
+
+            return false;
+        }
+    }
 }
