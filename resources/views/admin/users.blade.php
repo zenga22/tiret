@@ -72,7 +72,11 @@
                 <div class="modal-body">
                     <p>
                         Nota bene: il file deve essere in formato CSV (no XLS!), formattato con<br/>
-                        nome,cognome,username,indirizzo mail,nome del gruppo di riferimento
+                        nome,cognome,username,indirizzo mail,stato,nome del gruppo di riferimento
+                    </p>
+                    <p>
+                        "Stato" può assumere i valori 0 o 1, e viene usato per abilitare o disabilitare
+                        un account (senza eliminarlo).
                     </p>
                     <p>
                         Si raccomanda di togliere eventuali righe di intestazione in cima al file.

@@ -112,27 +112,54 @@ class AdminController extends Controller
                 continue;
             }
             else {
-                $username = $data[2];
+                $username = trim($data[2]);
+                $suspended = (intval(trim($data[4])) == 0);
+                $email = trim($data[3]);
+
                 $test = User::where('username', '=', $username)->first();
-                if ($test != null)
-                    continue;
+                if ($test != null) {
+                    $changed = false;
 
-                $u = new User();
-                $u->name = $data[0];
-                $u->surname = $data[1];
-                $u->username = $username;
-                $u->email = $data[3];
+                    if ($test->suspended != $suspended) {
+                        $test->suspended = $suspended;
+                        $changed = true;
+                    }
 
-                if (isset($groups[$data[4]]))
-                    $u->group_id = $groups[$data[4]];
-                else
-                    $u->group_id = -1;
+                    if ($test->email != $email && $test->email2 != $email && $test->email3 != $email) {
+                        if (empty($test->email))
+                            $test->email = $email;
+                        else if (empty($test->email2))
+                            $test->email2 = $email;
+                        else if (empty($test->email3))
+                            $test->email3 = $email;
+                        $changed = true;
+                    }
 
-                $password = str_random(10);
-                $u->password = Hash::make($password);
-                $u->save();
+                    if ($changed == true) {
+                        Log::info("Aggiornato utente $username");
+                        $test->save();
+                    }
+                }
+                else {
+                    $u = new User();
+                    $u->name = $data[0];
+                    $u->surname = $data[1];
+                    $u->username = $username;
+                    $u->email = $email;
+                    $u->suspended = $suspended;
 
-                Cloud::createFolder($u->username);
+                    if (isset($groups[$data[4]]))
+                        $u->group_id = $groups[$data[4]];
+                    else
+                        $u->group_id = -1;
+
+                    $password = str_random(10);
+                    $u->password = Hash::make($password);
+                    $u->save();
+
+                    Cloud::createFolder($u->username);
+                    Log::info("Creato nuovo utente $username");
+                }
             }
 
             $this->notifyNewUser($u, $password);
