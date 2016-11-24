@@ -159,11 +159,11 @@ class AdminController extends Controller
 
                     Cloud::createFolder($u->username);
                     Log::info("Creato nuovo utente $username");
+
+                    $this->notifyNewUser($u, $password);
+                    sleep(1);
                 }
             }
-
-            $this->notifyNewUser($u, $password);
-            sleep(1);
         }
 
         return null;
