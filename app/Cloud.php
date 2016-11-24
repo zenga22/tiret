@@ -72,7 +72,7 @@ class Cloud {
             $contents = Cloud::getContents($folder);
 
             foreach($contents as $c) {
-                $c = preg_replace($pattern, 'X', $c);
+                $c = preg_replace($pattern, 'X', basename($c));
                 if ($c == $filename)
                     return true;
             }
