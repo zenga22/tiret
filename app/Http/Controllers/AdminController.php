@@ -14,6 +14,7 @@ use App\User;
 use App\Group;
 use App\Cloud;
 use App\Rule;
+use App\Tlog;
 use DB;
 use Session;
 use Hash;
@@ -52,7 +53,6 @@ class AdminController extends Controller
             $currentgroup = Group::find($group_id);
             $data['currentgroup'] = $currentgroup;
             $data['users'] = $currentgroup->users;
-            $data['currentuser'] = $user;
             return Theme::view('admin.users', $data);
         }
         else {
@@ -137,7 +137,7 @@ class AdminController extends Controller
                     }
 
                     if ($changed == true) {
-                        Log::info("Aggiornato utente $username");
+                        Tlog::write('import', "Aggiornato utente $username");
                         $test->save();
                     }
                 }
@@ -159,7 +159,7 @@ class AdminController extends Controller
                     $u->save();
 
                     Cloud::createFolder($u->username);
-                    Log::info("Creato nuovo utente $username");
+                    Tlog::write('import', "Creato nuovo utente $username");
 
                     $this->notifyNewUser($u, $password);
                     sleep(1);
@@ -228,7 +228,6 @@ class AdminController extends Controller
             $data['user'] = $target;
             $data['files'] = Cloud::getContents($target->username, true);
             $data['groups'] = Group::get();
-            $data['currentuser'] = $user;
             return Theme::view('admin.display', $data);
         }
         else {
@@ -414,6 +413,12 @@ class AdminController extends Controller
         else {
             abort(403);
         }
+    }
+
+    public function getReports()
+    {
+        $data['logs'] = Tlog::orderBy('created_at', 'desc')->paginate(50);
+        return Theme::view('admin.reports', $data);
     }
 
     public function getCount(Request $request, $folder)

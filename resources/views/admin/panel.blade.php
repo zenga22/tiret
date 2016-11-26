@@ -18,6 +18,9 @@
         <div class="col-md-6">
             <a href="{{ url('admin/rules') }}" class="btn btn-primary btn-lg btn-block">Regole Assegnazione</a>
         </div>
+        <div class="col-md-6">
+            <a href="{{ url('admin/reports') }}" class="btn btn-primary btn-lg btn-block">Reports</a>
+        </div>
         @endrole
     </div>
 </div>

@@ -6,12 +6,13 @@ use Illuminate\Console\Command;
 
 use Storage;
 use Mail;
-use Log;
 use Event;
+use Log;
 
 use App\Cloud;
 use App\Rule;
 use App\User;
+use App\Tlog;
 use App\Events\FileToHandle;
 
 class AssignFiles extends Command
@@ -61,7 +62,7 @@ class AssignFiles extends Command
                         $filepath = $storagePath . $file;
 
                         if (Cloud::testExistance($folder . '/' . $filename)) {
-                            Log::info('File ' . $file . ' già caricato, salto');
+                            Tlog::write('files', 'File ' . $file . ' già caricato, salto');
 
                             if ($this->dry_run == false) {
                                 if ($this->keep_duplicates)
@@ -75,7 +76,6 @@ class AssignFiles extends Command
 
                         if ($this->dry_run == false)
                             Cloud::loadFile($filepath, $folder, $filename);
-                        Log::info('Caricato ' . $file . ' in ' . $folder);
 
                         if(env('SEND_MAIL', false) == true) {
                             $user = User::where('username', '=', $folder)->first();
@@ -94,23 +94,30 @@ class AssignFiles extends Command
                             else {
                                 if ($this->dry_run == false) {
                                     $user = new User();
+                                    $user->name = '???';
+                                    $user->surname = '???';
                                     $user->username = $folder;
                                     $user->save();
                                 }
 
-                                Log::info('Creato nuovo utente ' . $user->username);
+                                Tlog::write('files', 'Creato nuovo utente ' . $user->username . ', necessario popolare l\'anagrafica e notifica account');
                             }
                         }
 
                         if ($this->dry_run == false)
                             $disk->delete($file);
 
+                        Tlog::write('files', 'Caricato ' . $file . ' in ' . $folder);
+
                         break;
                     }
                 }
+
+                if ($disk->exists($file))
+                    Tlog::write('files', 'File ' . $file . ' non gestito');
             }
             catch(\Exception $e) {
-                Log::error('Errore con file ' . $file . ': ' . $e->getMessage());
+                Tlog::write('files', 'Errore nella manipolazione del file ' . $file . ': ' . $e->getMessage());
             }
 
             if ($this->dry_run == false)

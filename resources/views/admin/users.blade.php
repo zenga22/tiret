@@ -10,7 +10,7 @@
 
 <div class="container-fluid">
     <div class="row">
-        @if($currentuser->is('admin'))
+        @role('admin')
             <div class="col-md-3 options">
                 <button type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#createUser">Aggiungi Utente</button>
                 <button type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#importCSV">Importa CSV Utenti</button>
@@ -61,7 +61,7 @@
     </div>
 </div>
 
-@if($currentuser->is('admin'))
+@role('admin')
     @include('admin.edituser', ['id' => 'createUser', 'title' => 'Aggiungi Utente', 'user' => null])
 
     <div class="modal fade" id="importCSV" tabindex="-1" role="dialog" aria-labelledby="importCSVLavel">
@@ -102,6 +102,6 @@
             </div>
         </div>
     </div>
-@endif
+@endrole
 
 @endsection

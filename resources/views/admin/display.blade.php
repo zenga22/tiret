@@ -11,11 +11,11 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-4 options">
-            @if($currentuser->is('admin'))
+            @role('admin')
                 <button type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#editUser">Modifica Utente</button>
                 <button type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#enableUser">Abilita / Disabilita</button>
                 <button type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#removeUser">Elimina Utente</button>
-            @endif
+            @endrole
             <button type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#loadFile">Carica File</button>
         </div>
 
@@ -68,7 +68,7 @@
     </div>
 </div>
 
-@if($currentuser->is('admin'))
+@role('admin')
     @include('admin.edituser', ['id' => 'editUser', 'title' => 'Edita Utente', 'user' => $user])
 
     <div class="modal fade" id="enableUser" tabindex="-1" role="dialog" aria-labelledby="enableUserLavel">
@@ -132,6 +132,6 @@
             </div>
         </div>
     </div>
-@endif
+@endrole
 
 @endsection
