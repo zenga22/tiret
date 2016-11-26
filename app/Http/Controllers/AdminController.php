@@ -52,6 +52,7 @@ class AdminController extends Controller
             $currentgroup = Group::find($group_id);
             $data['currentgroup'] = $currentgroup;
             $data['users'] = $currentgroup->users;
+            $data['currentuser'] = $user;
             return Theme::view('admin.users', $data);
         }
         else {
@@ -227,6 +228,7 @@ class AdminController extends Controller
             $data['user'] = $target;
             $data['files'] = Cloud::getContents($target->username, true);
             $data['groups'] = Group::get();
+            $data['currentuser'] = $user;
             return Theme::view('admin.display', $data);
         }
         else {
@@ -257,7 +259,7 @@ class AdminController extends Controller
             $current_role = 'groupadmin';
         else
             $current_role = 'none';
-            
+
         if ($role != $current_role) {
             if ($current_role != 'none')
                 $user->detachRole(Role::where('slug', '=', $current_role)->first());
