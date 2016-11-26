@@ -145,6 +145,7 @@ return [
 
         // Illuminate\Mail\MailServiceProvider::class,
         App\Providers\EmergencyMailServiceProvider::class,
+        App\Providers\PluginsProvider::class,
 
         Bican\Roles\RolesServiceProvider::class,
         Caffeinated\Themes\ThemesServiceProvider::class,

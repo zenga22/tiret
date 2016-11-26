@@ -7,16 +7,28 @@ use Illuminate\Console\Command;
 use Storage;
 use Mail;
 use Log;
+use Event;
 
 use App\Cloud;
 use App\Rule;
 use App\User;
+use App\Events\FileToHandle;
 
 class AssignFiles extends Command
 {
     protected $signature = 'assignfiles';
     protected $description = '';
+
+    /*
+        Se true, eventuali files duplicati sono spostati in /tmp anziché essere
+        rimossi
+    */
     protected $keep_duplicates = true;
+
+    /*
+        Se true, nessun file viene realmente assegnato e nessuna mail spedita.
+        Utile per debuggare il comportamento dello script
+    */
     protected $dry_run = false;
 
     public function __construct()
@@ -37,6 +49,10 @@ class AssignFiles extends Command
                     continue;
 
                 Log::info('Manipolo file ' . $file);
+
+                Event::fire(new FileToHandle($file));
+                if ($disk->exists($file) == false)
+                    continue;
 
                 foreach($rules as $rule) {
                     $target = $rule->apply($file);

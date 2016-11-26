@@ -45,6 +45,17 @@ le proprie regular expressions, con cui estrarre il nome della cartella di desti
 eseguita: per far ciò, eseguire per mezzo di cron il comando `php artisan schedule:run` ogni
 minuto.
 
+# Plugins
+
+Viene fornito un semplice meccanismo per implementare funzionalità custom all'interno della
+applicazione, per maggiori dettagli si veda l'esempio in app/Plugins/SampleFileHandler.php
+
+Gli eventi sinora esistenti, per i quali i plugins possono registrarsi, sono:
+
+* *FileToHandle*: lanciato dal comando di auto-assegnazione dei files, permette di intercettare
+files speciali e trattarli separatamente. Si consiglia di eliminare o spostare il file eventualmente
+processato dalla cartella destinata agli uploads.
+
 # Temi
 
 L'aspetto grafico di **Tiret** è volutamente semplice e limitato, per permettere una facile
@@ -61,7 +72,7 @@ _config/themes.php_
 # Storia
 
 **Tiret** è stato inizialmente sviluppato per una agenzia di assistenza fiscale con la necessità
-di distribuire ed esporre ai propri 3000+ clienti documenti sulle buste paga, per un totale di
+di distribuire ed esporre ai propri 6000+ clienti documenti sulle buste paga, per un totale di
 svariati gigabytes al mese.
 
 Il nome _tirét_ in piemontese sta per _cassetto_.
