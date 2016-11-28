@@ -88,7 +88,7 @@
 
                         <div class="radio">
                             <label>
-                                <input type="radio" name="status" value="disabled"<?php if ($user->suspended == false) echo ' checked="checked"' ?>> Abilitato
+                                <input type="radio" name="status" value="enabled"<?php if ($user->suspended == false) echo ' checked="checked"' ?>> Abilitato
                             </label>
                         </div>
                         <div class="radio">
