@@ -115,7 +115,7 @@ class AdminController extends Controller
             else {
                 $username = trim($data[2]);
                 $suspended = (intval(trim($data[4])) == 0);
-                $email = trim($data[3]);
+                $email = strtolower(trim($data[3]));
 
                 $test = User::where('username', '=', $username)->first();
                 if ($test != null) {
@@ -126,7 +126,7 @@ class AdminController extends Controller
                         $changed = true;
                     }
 
-                    if ($test->email != $email && $test->email2 != $email && $test->email3 != $email) {
+                    if (strtolower($test->email) != $email && strtolower($test->email2) != $email && strtolower($test->email3) != $email) {
                         if (empty($test->email))
                             $test->email = $email;
                         else if (empty($test->email2))
@@ -149,8 +149,8 @@ class AdminController extends Controller
                     $u->email = $email;
                     $u->suspended = $suspended;
 
-                    if (isset($groups[$data[4]]))
-                        $u->group_id = $groups[$data[4]];
+                    if (isset($groups[$data[5]]))
+                        $u->group_id = $groups[$data[5]];
                     else
                         $u->group_id = -1;
 
