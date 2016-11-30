@@ -63,7 +63,10 @@ class Cloud {
         $pattern = env('MATCHING_RULE', '');
 
         if (empty($pattern)) {
-            return $disk->exists($name);
+            if ($disk->exists($name))
+                return $name;
+            else
+                return false;
         }
         else {
             $folder = dirname($name);
@@ -72,9 +75,9 @@ class Cloud {
             $contents = Cloud::getContents($folder);
 
             foreach($contents as $c) {
-                $c = preg_replace($pattern, 'X', basename($c));
-                if ($c == $filename)
-                    return true;
+                $test = preg_replace($pattern, 'X', basename($c));
+                if ($test == $filename)
+                    return $c;
             }
 
             return false;

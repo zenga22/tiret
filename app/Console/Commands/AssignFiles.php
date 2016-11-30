@@ -61,46 +61,44 @@ class AssignFiles extends Command
                         list($folder, $filename) = $target;
                         $filepath = $storagePath . $file;
 
-                        if (Cloud::testExistance($folder . '/' . $filename)) {
-                            Tlog::write('files', 'File ' . $file . ' già caricato, salto');
+                        $test = Cloud::testExistance($folder . '/' . $filename);
+                        if ($test !== false) {
+                            Tlog::write('files', 'File ' . $test . ' già caricato, sovrascrivo');
 
                             if ($this->dry_run == false) {
-                                if ($this->keep_duplicates)
-                                    rename($filepath, sys_get_temp_dir() . '/' . $filename);
-                                else
-                                    $disk->delete($file);
+                                Cloud::deleteFile($folder . '/' . basename($test));
+                                Cloud::loadFile($filepath, $folder, $filename);
                             }
-
-                            break;
                         }
+                        else {
+                            if ($this->dry_run == false)
+                                Cloud::loadFile($filepath, $folder, $filename);
 
-                        if ($this->dry_run == false)
-                            Cloud::loadFile($filepath, $folder, $filename);
+                            if(env('SEND_MAIL', false) == true) {
+                                $user = User::where('username', '=', $folder)->first();
+                                if ($user != null) {
+                                    foreach($user->emails as $e) {
+                                        if ($this->dry_run == false) {
+                                            Mail::send('emails.notify', ['text' => $user->group->mailtext], function ($m) use ($user, $filepath, $e) {
+                                                $m->to($e, $user->name . ' ' . $user->surname)->subject('nuovo documento disponibile');
+                                                $m->attach($filepath);
+                                            });
+                                        }
 
-                        if(env('SEND_MAIL', false) == true) {
-                            $user = User::where('username', '=', $folder)->first();
-                            if ($user != null) {
-                                foreach($user->emails as $e) {
+                                        Log::info('Inviata mail a ' . $user->name . ' ' . $user->surname . ' ' . $e);
+                                    }
+                                }
+                                else {
                                     if ($this->dry_run == false) {
-                                        Mail::send('emails.notify', ['text' => $user->group->mailtext], function ($m) use ($user, $filepath, $e) {
-                                            $m->to($e, $user->name . ' ' . $user->surname)->subject('nuovo documento disponibile');
-                                            $m->attach($filepath);
-                                        });
+                                        $user = new User();
+                                        $user->name = '???';
+                                        $user->surname = '???';
+                                        $user->username = $folder;
+                                        $user->save();
                                     }
 
-                                    Log::info('Inviata mail a ' . $user->name . ' ' . $user->surname . ' ' . $e);
+                                    Tlog::write('files', 'Creato nuovo utente ' . $user->username . ', necessario popolare l\'anagrafica e notificare account');
                                 }
-                            }
-                            else {
-                                if ($this->dry_run == false) {
-                                    $user = new User();
-                                    $user->name = '???';
-                                    $user->surname = '???';
-                                    $user->username = $folder;
-                                    $user->save();
-                                }
-
-                                Tlog::write('files', 'Creato nuovo utente ' . $user->username . ', necessario popolare l\'anagrafica e notifica account');
                             }
                         }
 
