@@ -8,6 +8,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
 use Auth;
+use Log;
 use App\User;
 use App\Group;
 use App\Cloud;
@@ -53,6 +54,25 @@ class FileController extends Controller
 
     public function show($folder, $filename)
     {
+        /*
+            La funzione deleteFileAfterSend() usata sotto non sembra funzionare
+            molto bene, sicché qui per sicurezza provvediamo a rimuovere tutti
+            gli eventuali files più vecchi di 24 ore onde evitare di riempire
+            a sproposito il disco
+        */
+        try {
+            $existing = glob(sys_get_temp_dir() . 'download*');
+            $expiration = time() - (60 * 60 * 24);
+            foreach($existing as $e) {
+                $info = stat($e);
+                if ($info['atime'] < $expiration)
+                    @unlink($e);
+            }
+        }
+        catch(\Exception $e) {
+            Log::error('Errore rimuovendo vecchi files scaricati');
+        }
+
         $user = Auth::user();
 
         if ($user->testAccess($folder) == true) {
