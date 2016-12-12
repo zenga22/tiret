@@ -66,7 +66,7 @@ class AssignFiles extends Command
                             Tlog::write('files', 'File ' . $test . ' già caricato, sovrascrivo');
 
                             if ($this->dry_run == false) {
-                                Cloud::deleteFile($folder . '/' . basename($test));
+                                Cloud::deleteFile($folder, basename($test));
                                 Cloud::loadFile($filepath, $folder, $filename);
                             }
                         }
