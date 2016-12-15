@@ -11,6 +11,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\AssignFiles::class,
         \App\Console\Commands\MassiveRemove::class,
         \App\Console\Commands\SendAll::class,
+        \App\Console\Commands\ResetPassword::class
     ];
 
     protected function schedule(Schedule $schedule)
