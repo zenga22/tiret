@@ -77,16 +77,18 @@ class AssignFiles extends Command
                             if(env('SEND_MAIL', false) == true) {
                                 $user = User::where('username', '=', $folder)->first();
                                 if ($user != null) {
-                                    foreach($user->emails as $e) {
-                                        if ($this->dry_run == false) {
-                                            Mail::send('emails.notify', ['text' => $user->group->mailtext], function ($m) use ($user, $filepath, $e) {
-                                                $m->to($e, $user->name . ' ' . $user->surname)->subject('nuovo documento disponibile');
-                                                $m->attach($filepath);
-                                            });
-                                        }
-
-                                        Log::info('Inviata mail a ' . $user->name . ' ' . $user->surname . ' ' . $e);
+                                    if ($this->dry_run == false) {
+                                        Mail::send('emails.notify', ['text' => $user->group->mailtext], function ($m) use ($user, $filepath) {
+                                            $m->to($user->email, $user->name . ' ' . $user->surname)->subject('nuovo documento disponibile');
+                                            if (empty($user->email2) == false)
+                                                $m->cc($user->email2);
+                                            if (empty($user->email3) == false)
+                                                $m->cc($user->email3);
+                                            $m->attach($filepath);
+                                        });
                                     }
+
+                                    Log::info('Inviata mail a ' . $user->name . ' ' . $user->surname . ' ' . $e);
                                 }
                                 else {
                                     if ($this->dry_run == false) {
