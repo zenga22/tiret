@@ -415,10 +415,18 @@ class AdminController extends Controller
         }
     }
 
-    public function getReports()
+    public function getReports(Request $request)
     {
-        Tlog::where('created_at', '<', date('Y-m-d G:i:s', strtotime('-60 days')))->delete();
-        $data['logs'] = Tlog::orderBy('created_at', 'desc');
+        if ($request->has('section')) {
+            Tlog::where('created_at', '<', date('Y-m-d G:i:s', strtotime('-60 days')))->delete();
+            $data['logs'] = Tlog::where('section', $request->input('section'))->orderBy('created_at', 'desc')->get();
+            $data['show_menu'] = false;
+        }
+        else {
+            $data['show_menu'] = true;
+            $data['logs'] = [];
+        }
+
         return Theme::view('admin.reports', $data);
     }
 

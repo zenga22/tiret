@@ -8,30 +8,42 @@
 </ol>
 
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-md-12 contents">
-            <div class="row">
-                <div class="col-md-12">
-                    <input type="text" class="form-control" id="textfilter" autocomplete="off" placeholder="Cerca...">
-                </div>
+    @if($show_menu)
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <p>Seleziona il gruppo di reports da visualizzare</p>
             </div>
-            <table class="table filteratable">
-                <thead>
-                    <tr>
-                        <th width="10%">Data</th>
-                        <th width="90%">Messaggio</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($logs as $log)
-                        <tr>
-                            <td>{{ $log->created_at }}</td>
-                            <td>{{ $log->message }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+            <div class="col-md-12 contents text-center">
+                <a class="btn btn-lg btn-primary" href="{{ url('/admin/reports?section=import') }}">Utenti</a>
+                <a class="btn btn-lg btn-primary" href="{{ url('/admin/reports?section=files') }}">Files</a>
+            </div>
         </div>
-    </div>
+    @else
+        <div class="row">
+            <div class="col-md-12 contents">
+                <div class="row">
+                    <div class="col-md-12">
+                        <input type="text" class="form-control" id="textfilter" autocomplete="off" placeholder="Cerca...">
+                    </div>
+                </div>
+                <table class="table filteratable">
+                    <thead>
+                        <tr>
+                            <th width="10%">Data</th>
+                            <th width="90%">Messaggio</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($logs as $log)
+                            <tr>
+                                <td>{{ $log->created_at }}</td>
+                                <td>{{ $log->message }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    @endif
 </div>
 @endsection
