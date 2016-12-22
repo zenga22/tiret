@@ -42,7 +42,13 @@
                     <tr>
                         <td>
                             {{ $user->surname }} {{ $user->name }}<br/>
-                            {{ $user->email }}
+                            {{ $user->email }}<br/>
+                            @if(!empty($user->email2))
+                                {{ $user->email2 }}<br/>
+                            @endif
+                            @if(!empty($user->email3))
+                                {{ $user->email3 }}<br/>
+                            @endif
                         </td>
                         <td>{{ $user->username }}</td>
                         <td><?php if($user->lastlogin == '0000-00-00') echo "Mai"; else echo $user->lastlogin ?></td>
