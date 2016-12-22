@@ -44,6 +44,11 @@ class AssignFiles extends Command
         $files = $disk->files('/');
         $rules = Rule::get();
 
+        $sent_counter = 0;
+        $notfound_counter = 0;
+        $overwrite_counter = 0;
+        $errors_counter = 0;
+
         foreach($files as $file) {
             try {
                 if (substr($file, 0, 1) == '.')
@@ -68,6 +73,7 @@ class AssignFiles extends Command
                             if ($this->dry_run == false) {
                                 Cloud::deleteFile($folder, basename($test));
                                 Cloud::loadFile($filepath, $folder, $filename);
+                                $overwrite_counter++;
                             }
                         }
                         else {
@@ -86,6 +92,8 @@ class AssignFiles extends Command
                                                 $m->cc($user->email3);
                                             $m->attach($filepath);
                                         });
+
+                                        $sent_counter++;
                                     }
 
                                     Log::info('Inviata mail a ' . $user->name . ' ' . $user->surname . ' ' . $e);
@@ -97,6 +105,8 @@ class AssignFiles extends Command
                                         $user->surname = '???';
                                         $user->username = $folder;
                                         $user->save();
+
+                                        $notfound_counter++;
                                     }
 
                                     Tlog::write('files', 'Creato nuovo utente ' . $user->username . ', necessario popolare l\'anagrafica e notificare account');
@@ -118,10 +128,17 @@ class AssignFiles extends Command
             }
             catch(\Exception $e) {
                 Tlog::write('files', 'Errore nella manipolazione del file ' . $file . ': ' . $e->getMessage());
+                $errors_counter++;
             }
 
             if ($this->dry_run == false)
                 usleep(500000);
+        }
+
+        if (!empty(env('ADMIN_NOTIFY_MAIL', '')) && $this->dry_run == false) {
+            Mail::send('emails.admin_files_notify', ['sent' => $sent_counter, 'notfound' => $notfound_counter, 'overwrite_counter' => $overwrite_counter, 'errors' => $errors_counter], function ($m) {
+                $m->to(env('ADMIN_NOTIFY_MAIL'))->subject('aggiornamento assegnazione files');
+            });
         }
     }
 }
