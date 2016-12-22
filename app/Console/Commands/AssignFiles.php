@@ -136,7 +136,7 @@ class AssignFiles extends Command
         }
 
         if (!empty(env('ADMIN_NOTIFY_MAIL', '')) && $this->dry_run == false) {
-            Mail::send('emails.admin_files_notify', ['sent' => $sent_counter, 'notfound' => $notfound_counter, 'overwrite_counter' => $overwrite_counter, 'errors' => $errors_counter], function ($m) {
+            Mail::send('emails.admin_files_notify', ['sent' => $sent_counter, 'notfound' => $notfound_counter, 'overwrite' => $overwrite_counter, 'errors' => $errors_counter], function ($m) {
                 $m->to(env('ADMIN_NOTIFY_MAIL'))->subject('aggiornamento assegnazione files');
             });
         }

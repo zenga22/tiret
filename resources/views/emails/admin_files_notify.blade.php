@@ -3,14 +3,14 @@
 </p>
 
 <p>
-    Files assegnati: {{ $sent_counter }}
+    Files assegnati: {{ $sent }}
 </p>
 <p>
-    Non assegnabili: {{ $notfound_counter }}
+    Non assegnabili: {{ $notfound }}
 </p>
 <p>
-    Sovrascritti: {{ $overwrite_counter }}
+    Sovrascritti: {{ $overwrite }}
 </p>
 <p>
-    Errori: {{ $errors_counter }}
+    Errori: {{ $errors }}
 </p>
