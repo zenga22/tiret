@@ -417,7 +417,8 @@ class AdminController extends Controller
 
     public function getReports()
     {
-        $data['logs'] = Tlog::orderBy('created_at', 'desc')->paginate(50);
+        Tlog::where('created_at', '<', date('Y-m-d G:i:s', strtotime('-60 days')))->delete();
+        $data['logs'] = Tlog::orderBy('created_at', 'desc');
         return Theme::view('admin.reports', $data);
     }
 

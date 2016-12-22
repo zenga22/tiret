@@ -9,8 +9,13 @@
 
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-12">
-            <table class="table">
+        <div class="col-md-12 contents">
+            <div class="row">
+                <div class="col-md-12">
+                    <input type="text" class="form-control" id="textfilter" autocomplete="off" placeholder="Cerca...">
+                </div>
+            </div>
+            <table class="table filteratable">
                 <thead>
                     <tr>
                         <th width="10%">Data</th>
@@ -26,8 +31,6 @@
                     @endforeach
                 </tbody>
             </table>
-
-            {!! $logs->render() !!}
         </div>
     </div>
 </div>
