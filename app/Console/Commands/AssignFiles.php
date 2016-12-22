@@ -96,7 +96,7 @@ class AssignFiles extends Command
                                         $sent_counter++;
                                     }
 
-                                    Log::info('Inviata mail a ' . $user->name . ' ' . $user->surname . ' ' . $e);
+                                    Tlog::write('files', 'Mail inviata a ' . join(', ', $user->emails));
                                 }
                                 else {
                                     if ($this->dry_run == false) {
