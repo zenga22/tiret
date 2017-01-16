@@ -186,35 +186,32 @@ class AdminController extends Controller
     public function postCreate(Request $request)
     {
         $username = $request->input('username');
-        $test = User::where(DB::raw('LOWER(username)'), '=', strtolower($username))->first();
 
-        if ($test == null) {
+        $user = User::where(DB::raw('LOWER(username)'), '=', strtolower($username))->first();
+        if ($user == null)
             $user = new User();
-            $user->name = $request->input('name');
-            $user->surname = $request->input('surname');
-            $user->username = $username;
-            $user->email = $request->input('email');
-            $user->email2 = $request->input('email2');
-            $user->email3 = $request->input('email3');
-            $user->group_id = $request->input('group');
 
-            $password = $request->input('password');
-            $user->password = Hash::make($password);
+        $user->name = $request->input('name');
+        $user->surname = $request->input('surname');
+        $user->username = $username;
+        $user->email = $request->input('email');
+        $user->email2 = $request->input('email2');
+        $user->email3 = $request->input('email3');
+        $user->group_id = $request->input('group');
 
-            $user->save();
+        $password = $request->input('password');
+        $user->password = Hash::make($password);
 
-            $role = $request->input('admin');
-            if ($role != 'none')
-                $user->attachRole(Role::where('slug', '=', $role)->first());
+        $user->save();
 
-            Cloud::createFolder($username);
-            $this->notifyNewUser($user, $password);
+        $role = $request->input('admin');
+        if ($role != 'none')
+            $user->attachRole(Role::where('slug', '=', $role)->first());
 
-            Session::flash('message', 'Utente creato');
-        }
-        else {
-            Session::flash('message', 'Username già esistente, impossibile creare nuovo utente');
-        }
+        Cloud::createFolder($username);
+        $this->notifyNewUser($user, $password);
+
+        Session::flash('message', 'Utente creato');
 
         return redirect(url('admin/users'));
     }
