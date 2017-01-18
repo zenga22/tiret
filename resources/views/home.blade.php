@@ -37,7 +37,7 @@
                             if (isset($matches['key']))
                                 $name = $matches['key'];
                             else
-                                $name = '?';
+                                $name = 'Altri';
 
                             if (isset($file_groups[$name]) == false)
                                 $file_groups[$name] = [];
@@ -59,7 +59,7 @@
                             <div role="tabpanel" class="tab-pane {{ $index++ == 0 ? 'active' : '' }}" id="{{ $name }}">
                                 <table class="table filelist filteratable">
                                     <tbody>
-                                        @foreach($files as $file)
+                                        @foreach(array_reverse($files) as $file)
                                             <tr>
                                                 <td><a href="{{ url('file/' . $file) }}">{{ basename($file) }}</a></td>
                                             </tr>
