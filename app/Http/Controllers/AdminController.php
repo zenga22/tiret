@@ -51,8 +51,15 @@ class AdminController extends Controller
                 abort(403);
 
             $currentgroup = Group::find($group_id);
-            $data['currentgroup'] = $currentgroup;
-            $data['users'] = $currentgroup->users;
+            if ($currentgroup != null) {
+                $data['currentgroup'] = $currentgroup;
+                $data['users'] = $currentgroup->users;
+            }
+            else {
+                $data['currentgroup'] = null;
+                $data['users'] = User::where('group_id', 0)->get();
+            }
+
             return Theme::view('admin.users', $data);
         }
         else {

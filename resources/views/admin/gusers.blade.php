@@ -16,6 +16,7 @@
             @foreach($groups as $group)
             <a class="btn btn-lg btn-primary" href="{{ url('/admin/users?group=' . $group->id) }}">{{ $group->name }}</a>
             @endforeach
+            <a class="btn btn-lg btn-primary" href="{{ url('/admin/users?group=none') }}">Nessuno</a>
         </div>
     </div>
 </div>
