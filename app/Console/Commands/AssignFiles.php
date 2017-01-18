@@ -75,6 +75,17 @@ class AssignFiles extends Command
                                 Cloud::loadFile($filepath, $folder, $filename);
                                 $overwrite_counter++;
                             }
+
+                            if(env('SEND_MAIL', false) == true) {
+                                Mail::send('emails.notify', ['text' => $user->group->updatemailtext], function ($m) use ($user, $filepath, $filename) {
+                                    $m->to($user->email, $user->name . ' ' . $user->surname)->subject('nuovo documento disponibile: ' . $filename);
+                                    if (empty($user->email2) == false)
+                                        $m->cc($user->email2);
+                                    if (empty($user->email3) == false)
+                                        $m->cc($user->email3);
+                                    $m->attach($filepath);
+                                });
+                            }
                         }
                         else {
                             if ($this->dry_run == false)
@@ -82,16 +93,36 @@ class AssignFiles extends Command
 
                             if(env('SEND_MAIL', false) == true) {
                                 $user = User::where('username', '=', $folder)->first();
+
                                 if ($user != null) {
                                     if ($this->dry_run == false) {
-                                        Mail::send('emails.notify', ['text' => $user->group->mailtext], function ($m) use ($user, $filepath) {
-                                            $m->to($user->email, $user->name . ' ' . $user->surname)->subject('nuovo documento disponibile');
-                                            if (empty($user->email2) == false)
-                                                $m->cc($user->email2);
-                                            if (empty($user->email3) == false)
-                                                $m->cc($user->email3);
-                                            $m->attach($filepath);
-                                        });
+                                        $filesize = filesize($filepath);
+
+                                        /*
+                                            Attenzione: SES ha un limite di 10MB
+                                            per gli allegati. In tal caso si
+                                            manda una mail di notifica senza il
+                                            file allegato
+                                        */
+                                        if ($filesize > 1024 * 1024 * 10) {
+                                            Mail::send('emails.notify', ['text' => $user->group->lightmailtext], function ($m) use ($user, $filepath, $filename) {
+                                                $m->to($user->email, $user->name . ' ' . $user->surname)->subject('nuovo documento disponibile: ' . $filename);
+                                                if (empty($user->email2) == false)
+                                                    $m->cc($user->email2);
+                                                if (empty($user->email3) == false)
+                                                    $m->cc($user->email3);
+                                            });
+                                        }
+                                        else {
+                                            Mail::send('emails.notify', ['text' => $user->group->mailtext], function ($m) use ($user, $filepath, $filename) {
+                                                $m->to($user->email, $user->name . ' ' . $user->surname)->subject('nuovo documento disponibile: ' . $filename);
+                                                if (empty($user->email2) == false)
+                                                    $m->cc($user->email2);
+                                                if (empty($user->email3) == false)
+                                                    $m->cc($user->email3);
+                                                $m->attach($filepath);
+                                            });
+                                        }
 
                                         $sent_counter++;
                                     }
@@ -132,7 +163,7 @@ class AssignFiles extends Command
             }
 
             if ($this->dry_run == false)
-                usleep(500000);
+                usleep(1000000);
         }
 
         if (!empty(env('ADMIN_NOTIFY_MAIL', '')) && $this->dry_run == false) {

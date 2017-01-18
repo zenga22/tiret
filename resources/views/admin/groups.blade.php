@@ -72,7 +72,7 @@
 
 @role('admin')
 <div class="modal fade" id="editGroups" tabindex="-1" role="dialog" aria-labelledby="editGroupsLavel">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -92,31 +92,40 @@
                     <hr />
 
                     @foreach($groups as $group)
-                    <div class="form-group">
-                        <input type="hidden" name="ids[]" value="{{ $group->id }}">
-
+                    <div class="col-md-6">
                         <div class="form-group">
-                            <label for="names[]">{{ $group->name }}</label>
-                            <input type="text" class="form-control" name="names[]" value="{{ $group->name }}">
-                        </div>
+                            <input type="hidden" name="ids[]" value="{{ $group->id }}">
 
-                        @if(env('SEND_MAIL', false) == true)
-                        <div class="form-group">
-                            <label for="mailtext[]">Testo mail di notifica da inviare ai membri di questo gruppo</label>
-                            <textarea class="form-control" name="mailtext[]">{{ $group->mailtext }}</textarea>
-                        </div>
-                        @endif
+                            <div class="form-group">
+                                <label for="names[]">{{ $group->name }}</label>
+                                <input type="text" class="form-control" name="names[]" value="{{ $group->name }}">
+                            </div>
 
-                        <div class="form-group">
-                            <label for="message[]">Testo di segnalazione da visualizzare per gli utenti del gruppo</label>
-                            <textarea class="form-control" name="message[]">{{ $group->message }}</textarea>
-                        </div>
+                            @if(env('SEND_MAIL', false) == true)
+                            <div class="form-group">
+                                <label for="mailtext[]">Testo mail di notifica assegnazione file</label>
+                                <textarea class="form-control" name="mailtext[]">{{ $group->mailtext }}</textarea>
+                            </div>
 
-                        <input type="checkbox" name="delete_{{ $group->id }}"> Elimina Gruppo {{ $group->name }}
+                            <div class="form-group">
+                                <label for="lightmailtext[]">Testo mail di notifica assegnazione file (versione senza allegato)</label>
+                                <textarea class="form-control" name="lightmailtext[]">{{ $group->lightmailtext }}</textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="updatedmailtext[]">Testo mail di notifica aggiornamento file</label>
+                                <textarea class="form-control" name="updatedmailtext[]">{{ $group->updatedmailtext }}</textarea>
+                            </div>
+                            @endif
+
+                            <div class="form-group">
+                                <label for="message[]">Testo di segnalazione da visualizzare per gli utenti del gruppo</label>
+                                <textarea class="form-control" name="message[]">{{ $group->message }}</textarea>
+                            </div>
+
+                            <input type="checkbox" name="delete_{{ $group->id }}"> Elimina Gruppo {{ $group->name }}
+                        </div>
                     </div>
-
-                    <hr />
-
                     @endforeach
 
                     <div class="form-group">
