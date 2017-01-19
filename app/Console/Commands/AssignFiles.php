@@ -77,6 +77,8 @@ class AssignFiles extends Command
                             }
 
                             if(env('SEND_MAIL', false) == true) {
+                                $user = User::where('username', '=', $folder)->first();
+
                                 Mail::send('emails.notify', ['text' => $user->group->updatemailtext], function ($m) use ($user, $filepath, $filename) {
                                     $m->to($user->email, $user->name . ' ' . $user->surname)->subject('nuovo documento disponibile: ' . $filename);
                                     if (empty($user->email2) == false)
