@@ -47,7 +47,7 @@ class AdminController extends Controller
 
         if ($request->has('group')) {
             $group_id = $request->input('group');
-            if ($user->is('admin') == false && ($user->is('groupadmin') && $group_id != $user->group_id))
+            if ($user->is('admin') == false && ($user->is('groupadmin') && $group_id != 'none' && $group_id != $user->group_id))
                 abort(403);
 
             $currentgroup = Group::find($group_id);
