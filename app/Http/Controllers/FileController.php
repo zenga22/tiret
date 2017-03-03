@@ -24,22 +24,39 @@ class FileController extends Controller
                 $filename = $request->file('file')->getClientOriginalName();
                 if ($request->file('file')->move(sys_get_temp_dir(), $filename)) {
                     $path = sys_get_temp_dir() . '/' . $filename;
+                    $target = null;
+                    $send_mail = false;
 
                     if ($request->has('user_id')) {
                         $target = User::findOrFail($request->input('user_id'));
                         $folder = $target->username;
                         $ret = redirect(url('admin/show/' . $target->id));
+                        $send_mail = env('SEND_MAIL', false);
                     }
                     else if ($request->has('group_id')) {
                         $group = Group::findOrFail($request->input('group_id'));
                         $folder = $group->name;
                         $ret = redirect(url('admin/groups/'));
+                        $send_mail = false;
                     }
 
                     if ($user->testAccess($folder))
                         Cloud::loadFile($path, $folder, $filename);
                     else
                         abort(403);
+
+                    if ($send_mail == true && $target != null) {
+                        Mail::send('emails.notify', ['text' => $target->group->mailtext], function ($m) use ($target, $filepath, $filename) {
+                            $m->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
+                            $m->to($target->email, $target->name . ' ' . $target->surname)->subject('nuovo documento disponibile: ' . $filename);
+
+                            if (empty($target->email2) == false)
+                                $m->cc($target->email2);
+                            if (empty($target->email3) == false)
+                                $m->cc($target->email3);
+                            $m->attach($path);
+                        });
+                    }
 
                     unlink($path);
                 }

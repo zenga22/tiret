@@ -80,7 +80,9 @@ class AssignFiles extends Command
                                 $user = User::where('username', '=', $folder)->first();
                                 if ($user != null && $user->group != null) {
                                     Mail::send('emails.notify', ['text' => $user->group->updatemailtext], function ($m) use ($user, $filepath, $filename) {
+                                        $m->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
                                         $m->to($user->email, $user->name . ' ' . $user->surname)->subject('nuovo documento disponibile: ' . $filename);
+
                                         if (empty($user->email2) == false)
                                             $m->cc($user->email2);
                                         if (empty($user->email3) == false)
@@ -110,7 +112,9 @@ class AssignFiles extends Command
                                             */
                                             if ($filesize > 1024 * 1024 * 10) {
                                                 Mail::send('emails.notify', ['text' => $user->group->lightmailtext], function ($m) use ($user, $filepath, $filename) {
+                                                    $m->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
                                                     $m->to($user->email, $user->name . ' ' . $user->surname)->subject('nuovo documento disponibile: ' . $filename);
+
                                                     if (empty($user->email2) == false)
                                                         $m->cc($user->email2);
                                                     if (empty($user->email3) == false)
@@ -119,7 +123,9 @@ class AssignFiles extends Command
                                             }
                                             else {
                                                 Mail::send('emails.notify', ['text' => $user->group->mailtext], function ($m) use ($user, $filepath, $filename) {
+                                                    $m->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
                                                     $m->to($user->email, $user->name . ' ' . $user->surname)->subject('nuovo documento disponibile: ' . $filename);
+
                                                     if (empty($user->email2) == false)
                                                         $m->cc($user->email2);
                                                     if (empty($user->email3) == false)
@@ -177,6 +183,7 @@ class AssignFiles extends Command
         if (!empty(env('ADMIN_NOTIFY_MAIL', '')) && $this->dry_run == false) {
             if ($sent_counter != 0 || $notfound_counter != 0 || $overwrite_counter != 0 || $errors_counter != 0) {
                 Mail::send('emails.admin_files_notify', ['sent' => $sent_counter, 'notfound' => $notfound_counter, 'overwrite' => $overwrite_counter, 'errors' => $errors_counter], function ($m) {
+                    $m->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
                     $m->to(env('ADMIN_NOTIFY_MAIL'))->subject('aggiornamento assegnazione files');
                 });
             }

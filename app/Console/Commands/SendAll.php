@@ -66,6 +66,7 @@ class SendAll extends Command
                 foreach($user->emails as $e) {
                     try {
                         Mail::send('emails.empty', ['text' => $user->group->mailtext], function ($m) use ($user, $local_files, $e) {
+                            $m->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
                             $m->to($e, $user->name . ' ' . $user->surname)->subject('nuovo documento disponibile');
 
                             foreach($local_files as $filepath)
@@ -90,4 +91,3 @@ class SendAll extends Command
         }
     }
 }
-

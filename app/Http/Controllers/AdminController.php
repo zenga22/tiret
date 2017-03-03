@@ -77,6 +77,7 @@ class AdminController extends Controller
         foreach($user->emails as $e) {
             try {
                 Mail::send('emails.creation', ['user' => $user, 'password' => $password], function ($m) use ($user, $e) {
+                    $m->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
                     $m->to($e, $user->name . ' ' . $user->surname)->subject('nuovo account accesso files');
                 });
             }
