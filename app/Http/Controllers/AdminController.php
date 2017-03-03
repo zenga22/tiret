@@ -74,15 +74,15 @@ class AdminController extends Controller
 
     private function notifyNewUser($user, $password)
     {
-        foreach($user->emails as $e) {
+        foreach($user->emails as $mail) {
             try {
-                Mail::send('emails.creation', ['user' => $user, 'password' => $password], function ($m) use ($user, $e) {
+                Mail::send('emails.creation', ['user' => $user, 'password' => $password], function ($m) use ($user, $mail) {
                     $m->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
-                    $m->to($e, $user->name . ' ' . $user->surname)->subject('nuovo account accesso files');
+                    $m->to($mail, $user->name . ' ' . $user->surname)->subject('nuovo account accesso files');
                 });
             }
             catch(\Exception $e) {
-                Log::info('Failed notification mail to ' . $e);
+                Log::info('Failed notification mail to ' . $mail . ': ' . $e->getMessage());
             }
         }
     }
