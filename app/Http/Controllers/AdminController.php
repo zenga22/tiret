@@ -57,7 +57,7 @@ class AdminController extends Controller
             }
             else {
                 $data['currentgroup'] = null;
-                $data['users'] = User::where('group_id', 0)->get();
+                $data['users'] = User::where('group_id', 0)->orderBy('surname', 'asc')->get();
             }
 
             return Theme::view('admin.users', $data);
@@ -150,8 +150,8 @@ class AdminController extends Controller
                 }
                 else {
                     $u = new User();
-                    $u->name = $data[0];
-                    $u->surname = $data[1];
+                    $u->name = trim($data[0]);
+                    $u->surname = trim($data[1]);
                     $u->username = $username;
                     $u->email = $email;
                     $u->suspended = $suspended;
@@ -198,12 +198,12 @@ class AdminController extends Controller
         if ($user == null)
             $user = new User();
 
-        $user->name = $request->input('name');
-        $user->surname = $request->input('surname');
-        $user->username = $username;
-        $user->email = $request->input('email');
-        $user->email2 = $request->input('email2');
-        $user->email3 = $request->input('email3');
+        $user->name = trim($request->input('name'));
+        $user->surname = trim($request->input('surname'));
+        $user->username = trim($username);
+        $user->email = trim($request->input('email'));
+        $user->email2 = trim($request->input('email2'));
+        $user->email3 = trim($request->input('email3'));
         $user->group_id = $request->input('group');
 
         $password = $request->input('password');
@@ -242,12 +242,12 @@ class AdminController extends Controller
     public function postSave(Request $request, $id)
     {
         $user = User::findOrFail($id);
-        $user->name = $request->input('name');
-        $user->surname = $request->input('surname');
-        $user->username = $request->input('username');
-        $user->email = $request->input('email');
-        $user->email2 = $request->input('email2');
-        $user->email3 = $request->input('email3');
+        $user->name = trim($request->input('name'));
+        $user->surname = trim($request->input('surname'));
+        $user->username = trim($request->input('username'));
+        $user->email = trim($request->input('email'));
+        $user->email2 = trim($request->input('email2'));
+        $user->email3 = trim($request->input('email3'));
         $user->group_id = $request->input('group');
 
         $password = $request->input('password');
@@ -353,7 +353,7 @@ class AdminController extends Controller
                     $group->delete();
                 }
                 else {
-                    $group->name = $names[$i];
+                    $group->name = trim($names[$i]);
                     $group->mailtext = isset($mailtexts[$i]) ? $mailtexts[$i] : '';
                     $group->lightmailtext = isset($lightmailtexts[$i]) ? $lightmailtexts[$i] : '';
                     $group->updatedmailtext = isset($updatemailtexts[$i]) ? $updatemailtexts[$i] : '';
