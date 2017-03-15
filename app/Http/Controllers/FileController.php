@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 
 use Auth;
 use Log;
+use Mail;
 use App\User;
 use App\Group;
 use App\Cloud;
