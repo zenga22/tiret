@@ -128,7 +128,7 @@
                     </div>
                     @endforeach
 
-                    <div class="form-group">
+                    <div class="col-md-12 form-group">
                         <label for="newgroup">Nuovo Gruppo</label>
                         <input type="text" class="form-control" name="newgroup">
                     </div>
