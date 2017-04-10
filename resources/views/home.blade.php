@@ -2,6 +2,7 @@
 
 @section('content')
 <ol class="breadcrumb">
+    <li>Documenti</li>
     <li class="pull-right"><a href="{{ url('/auth/logout') }}">Logout</a></li>
 </ol>
 
@@ -23,7 +24,9 @@
     </div>
 
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-6 my-files">
+            <h4>I miei documenti</h4>
+
             @if(count($files) == 0)
                 <p class="alert alert-info">Non hai files assegnati</p>
             @else
@@ -61,7 +64,9 @@
                                     <tbody>
                                         @foreach(array_reverse($files) as $file)
                                             <tr>
-                                                <td><a href="{{ url('file/' . $file) }}">{{ basename($file) }}</a></td>
+                                                <td>
+                                                    <a href="{{ url('file/' . $file) }}">{{ basename($file) }} <span class="btn btn-default pull-right">Scarica File</span></a>
+                                                </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -70,19 +75,21 @@
                         @endforeach
                     </div>
                 @else
-                    <table class="table filelist filteratable">
-                        <tbody>
-                            @foreach($files as $file)
-                                <tr>
-                                    <td><a href="{{ url('file/' . $file) }}">{{ basename($file) }}</a></td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                    <div class="tab-content">
+                        <table class="table filelist filteratable">
+                            <tbody>
+                                @foreach($files as $file)
+                                    <tr>
+                                        <td><a href="{{ url('file/' . $file) }}">{{ basename($file) }} <span class="btn btn-default pull-right">Scarica File</span></a></td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 @endif
             @endif
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6 group-files">
             @if(count($groupfiles) == 0)
                 <p class="alert alert-info">Il tuo gruppo non ha files assegnati</p>
             @else
@@ -90,7 +97,9 @@
                     <tbody>
                         @foreach($groupfiles as $file)
                             <tr>
-                                <td><a href="{{ url('file/' . $file) }}">{{ basename($file) }}</a></td>
+                                <td>
+                                    <a href="{{ url('file/' . $file) }}">{{ basename($file) }} <span class="btn btn-default pull-right">Scarica File</span></a>
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>
