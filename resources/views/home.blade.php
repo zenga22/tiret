@@ -47,6 +47,8 @@
                             $file_groups[$name][] = $file;
                         }
 
+                        krsort($file_groups);
+
                     ?>
 
                     <ul class="nav nav-tabs" role="tablist">
