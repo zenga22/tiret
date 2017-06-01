@@ -20,6 +20,16 @@
         </div>
     @else
         <div class="row">
+            <div class="col-md-12">
+                @foreach(['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'] as $index => $name)
+                    <a class="btn btn-{{ ($index == $month - 1) ? 'primary' : 'default' }}" href="{{ url('/admin/reports?section=' . $section . '&month=' . ($index + 1)) }}">{{ $name }}</a>
+                @endforeach
+            </div>
+        </div>
+
+        <hr/>
+
+        <div class="row">
             <div class="col-md-12 contents">
                 <div class="row">
                     <div class="col-md-12">

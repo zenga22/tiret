@@ -427,9 +427,13 @@ class AdminController extends Controller
     public function getReports(Request $request)
     {
         if ($request->has('section')) {
-            Tlog::where('created_at', '<', date('Y-m-d G:i:s', strtotime('-60 days')))->delete();
-            $data['logs'] = Tlog::where('section', $request->input('section'))->orderBy('created_at', 'desc')->get();
+            Tlog::where('created_at', '<', date('Y-m-d G:i:s', strtotime('-1 years')))->delete();
+            $section = $request->input('section');
+            $month = $request->input('month', date('m'));
+            $data['logs'] = Tlog::where('section', $section)->where(DB::raw('MONTH(created_at)'), $month)->orderBy('created_at', 'desc')->get();
             $data['show_menu'] = false;
+            $data['month'] = $month;
+            $data['section'] = $section;
         }
         else {
             $data['show_menu'] = true;
