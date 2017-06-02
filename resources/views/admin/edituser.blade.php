@@ -42,20 +42,22 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="radio">
-                        <label>
-                            <input type="radio" name="admin" value="none" checked="checked"<?php if ($user == null || $user->is('admin|groupadmin') == false) echo ' checked="checked"' ?>> Utente
-                        </label>
-                    </div>
-                    <div class="radio">
-                        <label>
-                            <input type="radio" name="admin" value="groupadmin"<?php if ($user != null && $user->is('groupadmin')) echo ' checked="checked"' ?>> Amministratore Gruppo
-                        </label>
-                    </div>
-                    <div class="radio">
-                        <label>
-                            <input type="radio" name="admin" value="admin"<?php if ($user != null && $user->is('admin')) echo ' checked="checked"' ?>> Amministratore Generale
-                        </label>
+                    <div class="form-group">
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="admin" value="none" checked="checked"<?php if ($user == null || $user->is('admin|groupadmin') == false) echo ' checked="checked"' ?>> Utente
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="admin" value="groupadmin"<?php if ($user != null && $user->is('groupadmin')) echo ' checked="checked"' ?>> Amministratore Gruppo
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="admin" value="admin"<?php if ($user != null && $user->is('admin')) echo ' checked="checked"' ?>> Amministratore Generale
+                            </label>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">

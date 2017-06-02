@@ -94,9 +94,7 @@ class FileController extends Controller
         $user = Auth::user();
 
         if ($user->testAccess($folder) == true) {
-            $contents = Cloud::readFile($folder, $filename);
-            $path = tempnam(sys_get_temp_dir(), 'download');
-            file_put_contents($path, $contents);
+            $path = Cloud::localPark($folder, $filename);
             return response()->download($path, $filename)->deleteFileAfterSend(true);
         }
         else {

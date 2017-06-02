@@ -79,16 +79,7 @@ class AssignFiles extends Command
                             if(env('SEND_MAIL', false) == true) {
                                 $user = User::where('username', '=', $folder)->first();
                                 if ($user != null && $user->group != null) {
-                                    Mail::send('emails.notify', ['text' => $user->group->updatemailtext], function ($m) use ($user, $filepath, $filename) {
-                                        $m->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
-                                        $m->to($user->email, $user->name . ' ' . $user->surname)->subject('nuovo documento disponibile: ' . $filename);
-
-                                        if (empty($user->email2) == false)
-                                            $m->cc($user->email2);
-                                        if (empty($user->email3) == false)
-                                            $m->cc($user->email3);
-                                        $m->attach($filepath);
-                                    });
+                                    $user->deliverDocument($filepath, $filename, true);
                                 }
                             }
                         }
@@ -102,38 +93,7 @@ class AssignFiles extends Command
                                 if ($user != null) {
                                     if ($user->group != null) {
                                         if ($this->dry_run == false) {
-                                            $filesize = filesize($filepath);
-
-                                            /*
-                                                Attenzione: SES ha un limite di 10MB
-                                                per gli allegati. In tal caso si
-                                                manda una mail di notifica senza il
-                                                file allegato
-                                            */
-                                            if ($filesize > 1024 * 1024 * 10) {
-                                                Mail::send('emails.notify', ['text' => $user->group->lightmailtext], function ($m) use ($user, $filepath, $filename) {
-                                                    $m->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
-                                                    $m->to($user->email, $user->name . ' ' . $user->surname)->subject('nuovo documento disponibile: ' . $filename);
-
-                                                    if (empty($user->email2) == false)
-                                                        $m->cc($user->email2);
-                                                    if (empty($user->email3) == false)
-                                                        $m->cc($user->email3);
-                                                });
-                                            }
-                                            else {
-                                                Mail::send('emails.notify', ['text' => $user->group->mailtext], function ($m) use ($user, $filepath, $filename) {
-                                                    $m->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
-                                                    $m->to($user->email, $user->name . ' ' . $user->surname)->subject('nuovo documento disponibile: ' . $filename);
-
-                                                    if (empty($user->email2) == false)
-                                                        $m->cc($user->email2);
-                                                    if (empty($user->email3) == false)
-                                                        $m->cc($user->email3);
-                                                    $m->attach($filepath);
-                                                });
-                                            }
-
+                                            $user->deliverDocument($filepath, $filename, false);
                                             $sent_counter++;
                                         }
 
@@ -149,6 +109,7 @@ class AssignFiles extends Command
                                         $user->name = '???';
                                         $user->surname = '???';
                                         $user->username = $folder;
+                                        $user->group_id = 0;
                                         $user->save();
 
                                         $notfound_counter++;

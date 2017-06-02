@@ -51,6 +51,14 @@ class Cloud {
         return $disk->get($folder . '/' . $filename);
     }
 
+    public static function localPark($folder, $filename)
+    {
+        $contents = Cloud::readFile($folder, $filename);
+        $path = tempnam(sys_get_temp_dir(), 'download');
+        file_put_contents($path, $contents);
+        return $path;
+    }
+
     public static function deleteFile($folder, $filename)
     {
         $disk = Storage::disk('s3');

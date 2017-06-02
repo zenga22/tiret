@@ -243,6 +243,9 @@ class AdminController extends Controller
     public function postSave(Request $request, $id)
     {
         $user = User::findOrFail($id);
+
+        $just_populated = ($user->group == null);
+
         $user->name = trim($request->input('name'));
         $user->surname = trim($request->input('surname'));
         $user->username = trim($request->input('username'));
@@ -252,7 +255,7 @@ class AdminController extends Controller
         $user->group_id = $request->input('group');
 
         $password = $request->input('password');
-        if ($password != '')
+        if (!empty($password))
             $user->password = Hash::make($password);
 
         $role = $request->input('admin');
@@ -272,6 +275,21 @@ class AdminController extends Controller
         }
 
         $user->save();
+
+        if ($just_populated && !empty($password)) {
+            $user = $user->fresh();
+            $this->notifyNewUser($user, $password);
+            Tlog::write('import', "Popolata anagrafica utente " . $user->username . ": inviata mail con credenziali");
+
+            $files = Cloud::getContents($user->username);
+            foreach($files as $filename) {
+                $filename = basename($filename);
+                $filepath = Cloud::localPark($user->username, $filename);
+                $user->deliverDocument($filepath, $filename, false);
+                unlink($filepath);
+            }
+        }
+
         return redirect(url('admin/show/' . $id));
     }
 

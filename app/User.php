@@ -10,6 +10,8 @@ use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Bican\Roles\Traits\HasRoleAndPermission;
 use Bican\Roles\Contracts\HasRoleAndPermission as HasRoleAndPermissionContract;
 
+use Mail;
+
 use App\Group;
 
 class User extends Model implements AuthenticatableContract, CanResetPasswordContract, HasRoleAndPermissionContract
@@ -75,5 +77,45 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         }
 
         return false;
+    }
+
+    public function deliverDocument($filepath, $filename, $update)
+    {
+        $filesize = filesize($filepath);
+        $user = $this;
+
+        /*
+            Attenzione: SES ha un limite di 10MB per gli allegati. In tal caso
+            si manda una mail di notifica senza il file allegato
+        */
+        if ($filesize > 1024 * 1024 * 10) {
+            Mail::send('emails.notify', ['text' => $user->group->lightmailtext], function ($m) use ($user, $filename) {
+                $m->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
+                $m->to($user->email, $user->name . ' ' . $user->surname)->subject('nuovo documento disponibile: ' . $filename);
+
+                if (empty($user->email2) == false)
+                    $m->cc($user->email2);
+                if (empty($user->email3) == false)
+                    $m->cc($user->email3);
+            });
+        }
+        else {
+            if ($update)
+                $mailtext = $user->group->updatemailtext;
+            else
+                $mailtext = $user->group->mailtext;
+
+            Mail::send('emails.notify', ['text' => $mailtext], function ($m) use ($user, $filepath, $filename) {
+                $m->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
+                $m->to($user->email, $user->name . ' ' . $user->surname)->subject('nuovo documento disponibile: ' . $filename);
+
+                if (empty($user->email2) == false)
+                    $m->cc($user->email2);
+                if (empty($user->email3) == false)
+                    $m->cc($user->email3);
+
+                $m->attach($filepath, ['as' => $filename]);
+            });
+        }
     }
 }
