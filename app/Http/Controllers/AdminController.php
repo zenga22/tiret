@@ -87,6 +87,21 @@ class AdminController extends Controller
         }
     }
 
+    private function notifyNewPassword($user, $password)
+    {
+        foreach($user->emails as $mail) {
+            try {
+                Mail::send('emails.changepassword', ['user' => $user, 'password' => $password], function ($m) use ($user, $mail) {
+                    $m->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
+                    $m->to($mail, $user->name . ' ' . $user->surname)->subject('modificato account accesso files');
+                });
+            }
+            catch(\Exception $e) {
+                Log::info('Failed notification mail to ' . $mail . ': ' . $e->getMessage());
+            }
+        }
+    }
+
     private function importing($step, $limit)
     {
         $path = sys_get_temp_dir() . '/' . 'import.csv';
@@ -288,6 +303,9 @@ class AdminController extends Controller
                 $user->deliverDocument($filepath, $filename, false);
                 unlink($filepath);
             }
+        }
+        else if (!empty($password)) {
+            $this->notifyNewPassword($user, $password);
         }
 
         return redirect(url('admin/show/' . $id));
