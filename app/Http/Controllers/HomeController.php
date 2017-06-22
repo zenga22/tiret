@@ -12,7 +12,6 @@ use Theme;
 
 class HomeController extends Controller
 {
-
     public function __construct()
     {
         parent::__construct();
@@ -31,10 +30,9 @@ class HomeController extends Controller
         }
         else {
             $data['user'] = $user;
-            $data['files'] = Cloud::getContents($user->username);
-            $data['groupfiles'] = Cloud::getContents($user->group->name);
+            $data['files'] = Cloud::getContents($user->username, true);
+            $data['groupfiles'] = Cloud::getContents($user->group->name, true);
             return Theme::view('home', $data);
         }
     }
-
 }

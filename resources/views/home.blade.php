@@ -62,31 +62,13 @@
                         <?php $index = 0 ?>
                         @foreach($file_groups as $name => $files)
                             <div role="tabpanel" class="tab-pane {{ $index++ == 0 ? 'active' : '' }}" id="{{ $name }}">
-                                <table class="table filelist filteratable">
-                                    <tbody>
-                                        @foreach(array_reverse($files) as $file)
-                                            <tr>
-                                                <td>
-                                                    <a href="{{ url('file/' . $file) }}">{{ basename($file) }} <span class="btn btn-default pull-right">Scarica File</span></a>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                                @include('generic.fileslist', ['files' => array_reverse($files), 'user' => $user])
                             </div>
                         @endforeach
                     </div>
                 @else
                     <div class="tab-content">
-                        <table class="table filelist filteratable">
-                            <tbody>
-                                @foreach($files as $file)
-                                    <tr>
-                                        <td><a href="{{ url('file/' . $file) }}">{{ basename($file) }} <span class="btn btn-default pull-right">Scarica File</span></a></td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                        @include('generic.fileslist', ['files' => $files, 'user' => $user])
                     </div>
                 @endif
             @endif
@@ -95,17 +77,7 @@
             @if(count($groupfiles) == 0)
                 <p class="alert alert-info">Il tuo gruppo non ha files assegnati</p>
             @else
-                <table class="table filelist filteratable">
-                    <tbody>
-                        @foreach($groupfiles as $file)
-                            <tr>
-                                <td>
-                                    <a href="{{ url('file/' . $file) }}">{{ basename($file) }} <span class="btn btn-default pull-right">Scarica File</span></a>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                @include('generic.fileslist', ['files' => $groupfiles, 'user' => null])
             @endif
         </div>
     </div>

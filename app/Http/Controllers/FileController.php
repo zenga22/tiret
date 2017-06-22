@@ -12,6 +12,7 @@ use Log;
 use Mail;
 use App\User;
 use App\Group;
+use App\Document;
 use App\Cloud;
 
 class FileController extends Controller
@@ -95,6 +96,20 @@ class FileController extends Controller
 
         if ($user->testAccess($folder) == true) {
             $path = Cloud::localPark($folder, $filename);
+
+            $document = Document::where('folder', $folder)->where('filename', $filename)->first();
+            if ($document == null) {
+                $document = new Document();
+                $document->folder = $folder;
+                $document->filename = $filename;
+                $document->downloaded = true;
+                $document->save();
+            }
+            else {
+                $document->downloaded = true;
+                $document->save();
+            }
+
             return response()->download($path, $filename)->deleteFileAfterSend(true);
         }
         else {
