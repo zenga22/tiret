@@ -62,7 +62,7 @@
                         <?php $index = 0 ?>
                         @foreach($file_groups as $name => $files)
                             <div role="tabpanel" class="tab-pane {{ $index++ == 0 ? 'active' : '' }}" id="{{ $name }}">
-                                @include('generic.fileslist', ['files' => array_reverse($files), 'user' => $user])
+                                @include('generic.fileslist', ['files' => $files, 'user' => $user])
                             </div>
                         @endforeach
                     </div>
