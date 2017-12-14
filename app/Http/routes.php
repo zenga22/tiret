@@ -8,7 +8,8 @@ Route::get('/home', function() {
 Route::controllers([
     'auth' => 'Auth\AuthController',
     'password' => 'Auth\PasswordController',
-    'admin' => 'AdminController'
+    'admin' => 'AdminController',
+    'user' => 'UserController'
 ]);
 
 Route::get('file/delete/{folder}/{name}', 'FileController@destroy');

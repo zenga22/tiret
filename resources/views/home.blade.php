@@ -4,6 +4,7 @@
 <ol class="breadcrumb">
     <li>Documenti</li>
     <li class="pull-right"><a href="{{ url('/auth/logout') }}">Logout</a></li>
+    <li class="pull-right"><a href="{{ url('/user') }}">Cambia Password</a></li>
 </ol>
 
 <div class="container-fluid">
