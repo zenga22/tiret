@@ -14,6 +14,7 @@
             <div class="col-md-3 options">
                 <button type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#createUser">Aggiungi Utente</button>
                 <button type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#importCSV">Importa CSV Utenti</button>
+                <a href="{{ url('user/export?group=' . ($currentgroup ? $currentgroup->id : 'none')) }}" class="btn btn-primary btn-lg btn-block">Esporta CSV Utenti</a>
             </div>
 
             <div class="col-md-9 contents">
