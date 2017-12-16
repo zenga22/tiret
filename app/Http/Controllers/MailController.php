@@ -31,10 +31,22 @@ class MailController extends Controller
         }
         else if ($message['Type'] === 'Notification') {
             $data = json_decode($message['Message']);
-            $message_id = $data->mail->messageId;
+
+            $filename = null;
+            foreach($data->mail->headers as $header) {
+                if ($header->name == 'X-Tiret-Filename') {
+                    $filename = $header->value;
+                    break;
+                }
+            }
+
+            if ($filename == null) {
+                Log::error('Arrivata notifica per mail non identificata: ' . print_r($message, true));
+                return;
+            }
 
             if ($data->notificationType == 'Delivery') {
-                Mlog::updateStatus($message_id, 'sent');
+                Mlog::updateStatus($filename, 'sent');
             }
             else {
                 if (isset($data->bounce)) {
@@ -42,9 +54,9 @@ class MailController extends Controller
                     $message = $data->bounce->bouncedRecipients[0]->diagnosticCode;
 
                     if (strstr($message, 'too busy') !== false)
-                        Mlog::updateStatus($message_id, 'reschedule');
+                        Mlog::updateStatus($filename, 'reschedule');
                     else
-                        Mlog::updateStatus($message_id, 'fail');
+                        Mlog::updateStatus($filename, 'fail');
                 }
                 else {
                     Log::error('Unrecognized notification from SNS: ' . print_r($data, true));

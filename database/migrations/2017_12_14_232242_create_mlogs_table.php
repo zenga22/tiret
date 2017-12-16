@@ -10,7 +10,6 @@ class CreateMlogsTable extends Migration
         Schema::create('mlogs', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id')->unsigned();
-            $table->string('messageid');
             $table->string('filename');
             $table->enum('status', ['try', 'sent', 'reschedule', 'fail']);
             $table->timestamps();

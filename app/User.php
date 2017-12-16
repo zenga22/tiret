@@ -64,10 +64,38 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         return false;
     }
 
+    private function prepareMail($m, $filename, $filepath)
+    {
+        $m->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
+        $m->to($this->email, $this->name . ' ' . $this->surname)->subject('nuovo documento disponibile: ' . $filename);
+
+        if (empty($this->email2) == false)
+            $m->cc($this->email2);
+        if (empty($this->email3) == false)
+            $m->cc($this->email3);
+
+        if($filepath != null)
+            $m->attach($filepath, ['as' => $filename]);
+
+        /*
+            Purtroppo non è possibile (o comunque è molto scomodo) intercettare
+            l'ID della mail generato da SES, in modo da poi matchare la notifica
+            in arrivo da SNS.
+            Sicché qui aggiungo come header della mail il nome del file
+            trattato, per poter identificare e trattare la risposta.
+            https://laracasts.com/discuss/channels/laravel/mail-and-the-message-id
+        */
+        $m->getSwiftMessage()->getHeaders()->addTextHeader('X-Tiret-Filename', $filename);
+
+        return $m;
+    }
+
     public function deliverDocument($filepath, $filename, $update)
     {
         $filesize = filesize($filepath);
         $user = $this;
+
+        Mlog::addStatus($this->id, $filename);
 
         /*
             Attenzione: SES ha un limite di 10MB per gli allegati.
@@ -76,13 +104,7 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         */
         if ($filesize > 1024 * 1024 * 9) {
             Mail::send('emails.notify', ['text' => $user->group->lightmailtext], function ($m) use ($user, $filename) {
-                $m->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
-                $m->to($user->email, $user->name . ' ' . $user->surname)->subject('nuovo documento disponibile: ' . $filename);
-
-                if (empty($user->email2) == false)
-                    $m->cc($user->email2);
-                if (empty($user->email3) == false)
-                    $m->cc($user->email3);
+                $user->prepareMail($m, $filename, null);
             });
         }
         else {
@@ -92,18 +114,8 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
                 $mailtext = $user->group->mailtext;
 
             Mail::send('emails.notify', ['text' => $mailtext], function ($m) use ($user, $filepath, $filename) {
-                $m->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
-                $m->to($user->email, $user->name . ' ' . $user->surname)->subject('nuovo documento disponibile: ' . $filename);
-
-                if (empty($user->email2) == false)
-                    $m->cc($user->email2);
-                if (empty($user->email3) == false)
-                    $m->cc($user->email3);
-
-                $m->attach($filepath, ['as' => $filename]);
+                $user->prepareMail($m, $filename, $filepath);
             });
         }
-
-        Mlog::addStatus($this->id, $filename);
     }
 }

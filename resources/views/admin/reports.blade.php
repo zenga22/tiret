@@ -16,7 +16,10 @@
             <div class="col-md-12 contents text-center">
                 <a class="btn btn-lg btn-primary" href="{{ url('/admin/reports?section=import') }}">Utenti</a>
                 <a class="btn btn-lg btn-primary" href="{{ url('/admin/reports?section=files') }}">Files</a>
-                <a class="btn btn-lg btn-primary" href="{{ url('/admin/reports?section=mail') }}">Mail</a>
+
+                @if(env('TRACK_MAIL_STATUS', false) == true)
+                    <a class="btn btn-lg btn-primary" href="{{ url('/admin/reports?section=mail') }}">Mail</a>
+                @endif
             </div>
         </div>
     @else

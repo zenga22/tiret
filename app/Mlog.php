@@ -55,13 +55,6 @@ class Mlog extends Model
         return sprintf('<span class="glyphicon glyphicon-%s" aria-hidden="true"></span> %s', $icon, $this->string_description);
     }
 
-    public static function registerMessageId($message_id)
-    {
-        $actual = Mlog::orderBy('id', 'desc')->first();
-        $actual->message_id = $message_id;
-        $actual->save();
-    }
-
     private static function archiveFilePath($filename)
     {
         $storage = Cloud::mainLocalFolder();
@@ -76,6 +69,9 @@ class Mlog extends Model
 
     public static function addStatus($user_id, $filename)
     {
+        if (env('TRACK_MAIL_STATUS', false) == false)
+            return;
+
         $actual = Mlog::where('user_id', $user_id)->where('filename', $filename)->first();
         if ($actual == null) {
             $actual = new Mlog();
@@ -91,9 +87,17 @@ class Mlog extends Model
         copy($current_path, $archive_path);
     }
 
-    public static function updateStatus($message_id, $status)
+    public static function updateStatus($filename, $status)
     {
-        $actual = Mlog::where('message_id', $message_id)->first();
+        if (env('TRACK_MAIL_STATUS', false) == false)
+            return;
+
+        $actual = Mlog::where('filename', $filename)->first();
+        if ($actual == null) {
+            Log::error('Aggiornamento di messaggio non noto: ' . $message_id);
+            return;
+        }
+
         $actual->status = $status;
         $actual->save();
 
