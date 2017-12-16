@@ -20,25 +20,8 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 {
     use Authenticatable, CanResetPassword, HasRoleAndPermission;
 
-    /**
-     * The database table used by the model.
-     *
-     * @var string
-     */
     protected $table = 'users';
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = ['name', 'surname', 'username', 'email', 'password'];
-
-    /**
-     * The attributes excluded from the model's JSON form.
-     *
-     * @var array
-     */
     protected $hidden = ['password', 'remember_token'];
 
     public function group()
@@ -87,10 +70,11 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         $user = $this;
 
         /*
-            Attenzione: SES ha un limite di 10MB per gli allegati. In tal caso
-            si manda una mail di notifica senza il file allegato
+            Attenzione: SES ha un limite di 10MB per gli allegati.
+            Per scaramanzia, vengono inviati solo quelli sotto i 9MB.
+            Se superano questa soglia, si invia solo una mail di notifica
         */
-        if ($filesize > 1024 * 1024 * 10) {
+        if ($filesize > 1024 * 1024 * 9) {
             Mail::send('emails.notify', ['text' => $user->group->lightmailtext], function ($m) use ($user, $filename) {
                 $m->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
                 $m->to($user->email, $user->name . ' ' . $user->surname)->subject('nuovo documento disponibile: ' . $filename);
