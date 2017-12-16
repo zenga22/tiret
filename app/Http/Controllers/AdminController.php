@@ -465,22 +465,62 @@ class AdminController extends Controller
     public function getReports(Request $request)
     {
         if ($request->has('section')) {
-            $expiring_date = date('Y-m-d G:i:s', strtotime('-1 years'));
             $section = $request->input('section');
-            $month = $request->input('month', date('m'));
 
-            if ($section == 'mail') {
-                Mlog::where('created_at', '<', $expiring_date)->delete();
-                $data['logs'] = Mlog::where(DB::raw('MONTH(created_at)'), $month)->orderBy('created_at', 'desc')->get();
+            if ($request->has('download')) {
+                header('Content-Type: text/csv');
+                header('Content-Disposition: attachment; filename="export_utenti.csv"');
+                header('Cache-Control: no-cache, no-store, must-revalidate');
+                header('Pragma: no-cache');
+                header('Expires: 0');
+
+                if ($section == 'mail') {
+                    $data = Mlog::orderBy('created_at', 'asc')->get();
+                    echo join(',', ['Data', 'Utente', 'Mail', 'Documento', 'Stato']) . "\n";
+                    foreach($data as $d) {
+                        $row = [
+                            $d->created_at,
+                            $d->user->username,
+                            join(', ', $d->user->emails),
+                            $d->filename,
+                            $d->string_description
+                        ];
+
+                        echo '"' . join('","', $row) . '"' . "\n";
+                    }
+                }
+                else {
+                    $data = Tlog::where('section', $section)->orderBy('created_at', 'asc')->get();
+                    echo join(',', ['Data', 'Messaggio']) . "\n";
+                    foreach($data as $d) {
+                        $row = [
+                            $d->created_at,
+                            $d->message
+                        ];
+
+                        echo '"' . join('","', $row) . '"' . "\n";
+                    }
+                }
+
+                exit();
             }
             else {
-                Tlog::where('created_at', '<', $expiring_date)->delete();
-                $data['logs'] = Tlog::where('section', $section)->where(DB::raw('MONTH(created_at)'), $month)->orderBy('created_at', 'desc')->get();
-            }
+                $expiring_date = date('Y-m-d G:i:s', strtotime('-1 years'));
+                $month = $request->input('month', date('m'));
 
-            $data['show_menu'] = false;
-            $data['month'] = $month;
-            $data['section'] = $section;
+                if ($section == 'mail') {
+                    Mlog::where('created_at', '<', $expiring_date)->delete();
+                    $data['logs'] = Mlog::where(DB::raw('MONTH(created_at)'), $month)->orderBy('created_at', 'desc')->get();
+                }
+                else {
+                    Tlog::where('created_at', '<', $expiring_date)->delete();
+                    $data['logs'] = Tlog::where('section', $section)->where(DB::raw('MONTH(created_at)'), $month)->orderBy('created_at', 'desc')->get();
+                }
+
+                $data['show_menu'] = false;
+                $data['month'] = $month;
+                $data['section'] = $section;
+            }
         }
         else {
             $data['show_menu'] = true;

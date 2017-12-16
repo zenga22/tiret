@@ -13,28 +13,46 @@ class Mlog extends Model
         return $this->belongsTo('App\User');
     }
 
+    public function getStringDescriptionAttribute()
+    {
+        $text = '';
+
+        switch($this->status) {
+            case 'try':
+                $text = 'In attesa';
+                break;
+            case 'sent':
+                $text = 'Inviata';
+                break;
+            case 'fail':
+                $text = 'Fallita';
+                break;
+            case 'reschedule':
+                $text = 'Riprovare';
+                break;
+        }
+
+        return $text;
+    }
+
     public function getDescriptionAttribute()
     {
         switch($this->status) {
             case 'try':
                 $icon = 'question-sign';
-                $text = 'In attesa';
                 break;
             case 'sent':
                 $icon = 'ok';
-                $text = 'Inviata';
                 break;
             case 'fail':
                 $icon = 'remove';
-                $text = 'Fallita';
                 break;
             case 'reschedule':
                 $icon = 'time';
-                $text = 'Riprovare';
                 break;
         }
 
-        return sprintf('<span class="glyphicon glyphicon-%s" aria-hidden="true"></span> %s', $icon, $text);
+        return sprintf('<span class="glyphicon glyphicon-%s" aria-hidden="true"></span> %s', $icon, $this->string_description);
     }
 
     public static function registerMessageId($message_id)

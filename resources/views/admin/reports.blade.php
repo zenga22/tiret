@@ -25,6 +25,8 @@
                 @foreach(['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'] as $index => $name)
                     <a class="btn btn-{{ ($index == $month - 1) ? 'primary' : 'default' }}" href="{{ url('/admin/reports?section=' . $section . '&month=' . ($index + 1)) }}">{{ $name }}</a>
                 @endforeach
+
+                <a class="btn btn-default pull-right" href="{{ url('/admin/reports?section=' . $section . '&download=csv') }}">Download CSV</a>
             </div>
         </div>
 
