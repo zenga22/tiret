@@ -10,6 +10,7 @@ quantità di files ad un gran numero di utenti.
 * cartelle private per gli utenti e cartelle comuni per i gruppi
 * solo gli amministratori possono creare e rimuovere files
 * auto-assegnazione dei files caricati in base al loro nome
+* tracciamente stato delle mail inviate
 * importazione degli utenti da file CSV
 * possibilità di customizzazione del tema grafico
 
@@ -44,6 +45,19 @@ le proprie regular expressions, con cui estrarre il nome della cartella di desti
 È necessario abilitare lo scheduler interno a Laravel affinché la routine di assegnazione venga
 eseguita: per far ciò, eseguire per mezzo di cron il comando `php artisan schedule:run` ogni
 minuto.
+
+Definendo in `.env` il parametro `ADMIN_NOTIFY_MAIL=esempio@test.com`, l'indirizzo mail definito
+riceverà un breve report sullo stato delle attività di assegnazione.
+
+# Tracciamento Mail
+
+Se le mail vengono inoltrate per mezzo di Amazon SES, è possibile registrare un topic SNS e
+sottoscriverlo all'URL `http://miodominio.com/mail/status` per tracciare lo stato dei messaggi in
+uscita.
+
+Una volta definito in `.env` il parametro `TRACK_MAIL_STATUS=true` il sistema provvederà a
+mantenere lo storico delle mail gestite, ed in alcuni casi sarà in grado di tentare un nuovo
+inoltro in caso di mancato successo.
 
 # Plugins
 
