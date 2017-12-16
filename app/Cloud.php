@@ -4,6 +4,10 @@ use Storage;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 
 class Cloud {
+    public static function mainLocalFolder()
+    {
+        return Storage::disk('local')->getDriver()->getAdapter()->getPathPrefix();
+    }
 
     public static function getContents($folder, $sort = false)
     {

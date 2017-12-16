@@ -40,7 +40,7 @@ class AssignFiles extends Command
     public function handle()
     {
         $disk = Storage::disk('local');
-        $storagePath = Storage::disk('local')->getDriver()->getAdapter()->getPathPrefix();
+        $storagePath = Cloud::mainLocalFolder();
         $files = $disk->files('/');
         $rules = Rule::get();
 

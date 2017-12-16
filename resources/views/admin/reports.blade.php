@@ -16,6 +16,7 @@
             <div class="col-md-12 contents text-center">
                 <a class="btn btn-lg btn-primary" href="{{ url('/admin/reports?section=import') }}">Utenti</a>
                 <a class="btn btn-lg btn-primary" href="{{ url('/admin/reports?section=files') }}">Files</a>
+                <a class="btn btn-lg btn-primary" href="{{ url('/admin/reports?section=mail') }}">Mail</a>
             </div>
         </div>
     @else
@@ -37,20 +38,43 @@
                     </div>
                 </div>
                 <table class="table filteratable">
-                    <thead>
-                        <tr>
-                            <th width="10%">Data</th>
-                            <th width="90%">Messaggio</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($logs as $log)
+                    @if($section == 'mail')
+                        <thead>
                             <tr>
-                                <td>{{ $log->created_at }}</td>
-                                <td>{{ $log->message }}</td>
+                                <th width="10%">Data</th>
+                                <th width="20%">Utente</th>
+                                <th width="30%">Mail</th>
+                                <th width="30%">Documento</th>
+                                <th width="10%">Stato</th>
                             </tr>
-                        @endforeach
-                    </tbody>
+                        </thead>
+                        <tbody>
+                            @foreach($logs as $log)
+                                <tr>
+                                    <td>{{ $log->created_at }}</td>
+                                    <td>{{ $log->user->username }}</td>
+                                    <td>{{ join(', ', $log->user->emails) }}</td>
+                                    <td>{{ $log->filename }}</td>
+                                    <td>{!! $log->description !!}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    @else
+                        <thead>
+                            <tr>
+                                <th width="10%">Data</th>
+                                <th width="90%">Messaggio</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($logs as $log)
+                                <tr>
+                                    <td>{{ $log->created_at }}</td>
+                                    <td>{{ $log->message }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    @endif
                 </table>
             </div>
         </div>

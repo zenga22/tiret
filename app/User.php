@@ -10,9 +10,11 @@ use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Bican\Roles\Traits\HasRoleAndPermission;
 use Bican\Roles\Contracts\HasRoleAndPermission as HasRoleAndPermissionContract;
 
+use Storage;
 use Mail;
 
 use App\Group;
+use App\Mlog;
 
 class User extends Model implements AuthenticatableContract, CanResetPasswordContract, HasRoleAndPermissionContract
 {
@@ -117,5 +119,7 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
                 $m->attach($filepath, ['as' => $filename]);
             });
         }
+
+        Mlog::addStatus($this->id, $filename);
     }
 }

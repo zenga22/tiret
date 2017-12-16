@@ -10,17 +10,19 @@ use App\Http\Controllers\Controller;
 use Bican\Roles\Models\Role;
 
 use Auth;
-use App\User;
-use App\Group;
-use App\Cloud;
-use App\Rule;
-use App\Tlog;
 use DB;
 use Session;
 use Hash;
 use Theme;
 use Mail;
 use Log;
+
+use App\User;
+use App\Group;
+use App\Cloud;
+use App\Rule;
+use App\Tlog;
+use App\Mlog;
 
 class AdminController extends Controller
 {
@@ -463,10 +465,19 @@ class AdminController extends Controller
     public function getReports(Request $request)
     {
         if ($request->has('section')) {
-            Tlog::where('created_at', '<', date('Y-m-d G:i:s', strtotime('-1 years')))->delete();
+            $expiring_date = date('Y-m-d G:i:s', strtotime('-1 years'));
             $section = $request->input('section');
             $month = $request->input('month', date('m'));
-            $data['logs'] = Tlog::where('section', $section)->where(DB::raw('MONTH(created_at)'), $month)->orderBy('created_at', 'desc')->get();
+
+            if ($section == 'mail') {
+                Mlog::where('created_at', '<', $expiring_date)->delete();
+                $data['logs'] = Mlog::where(DB::raw('MONTH(created_at)'), $month)->orderBy('created_at', 'desc')->get();
+            }
+            else {
+                Tlog::where('created_at', '<', $expiring_date)->delete();
+                $data['logs'] = Tlog::where('section', $section)->where(DB::raw('MONTH(created_at)'), $month)->orderBy('created_at', 'desc')->get();
+            }
+
             $data['show_menu'] = false;
             $data['month'] = $month;
             $data['section'] = $section;

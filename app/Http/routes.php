@@ -15,3 +15,5 @@ Route::controllers([
 Route::get('file/delete/{folder}/{name}', 'FileController@destroy');
 Route::get('file/{folder}/{name}', 'FileController@show');
 Route::resource('file', 'FileController');
+
+Route::post('mail/status', 'MailController@postStatus');
