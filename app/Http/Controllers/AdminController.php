@@ -492,15 +492,24 @@ class AdminController extends Controller
                     }
                 }
                 else {
-                    $data = Tlog::where('section', $section)->orderBy('created_at', 'asc')->get();
                     echo join(',', ['Data', 'Messaggio']) . "\n";
-                    foreach($data as $d) {
-                        $row = [
-                            $d->created_at,
-                            $d->message
-                        ];
+                    $index = 0;
 
-                        echo '"' . join('","', $row) . '"' . "\n";
+                    while (true) {
+                        $data = Tlog::where('section', $section)->orderBy('created_at', 'asc')->take(100)->offset($index * 100)->get();
+                        if($data->isEmpty())
+                            break;
+
+                        foreach($data as $d) {
+                            $row = [
+                                $d->created_at,
+                                $d->message
+                            ];
+
+                            echo '"' . join('","', $row) . '"' . "\n";
+                        }
+
+                        $index++;
                     }
                 }
 
