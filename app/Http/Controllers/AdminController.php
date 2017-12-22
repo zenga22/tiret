@@ -477,18 +477,27 @@ class AdminController extends Controller
                 header('Expires: 0');
 
                 if ($section == 'mail') {
-                    $data = Mlog::orderBy('created_at', 'asc')->get();
                     echo join(',', ['Data', 'Utente', 'Mail', 'Documento', 'Stato']) . "\n";
-                    foreach($data as $d) {
-                        $row = [
-                            $d->created_at,
-                            $d->user->username,
-                            join(', ', $d->user->emails),
-                            $d->filename,
-                            $d->string_description
-                        ];
+                    $index = 0;
 
-                        echo '"' . join('","', $row) . '"' . "\n";
+                    while (true) {
+                        $data = Mlog::orderBy('created_at', 'asc')->take(100)->offset($index * 100)->get();
+                        if($data->isEmpty())
+                            break;
+
+                        foreach($data as $d) {
+                            $row = [
+                                $d->created_at,
+                                $d->user->username,
+                                join(', ', $d->user->emails),
+                                $d->filename,
+                                $d->string_description
+                            ];
+
+                            echo '"' . join('","', $row) . '"' . "\n";
+                        }
+
+                        $index++;
                     }
                 }
                 else {

@@ -102,7 +102,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="emails[]">{{ $group->email }}</label>
+                                <label for="emails[]">Email</label>
                                 <input type="text" class="form-control" name="emails[]" value="{{ $group->email }}">
                             </div>
 
