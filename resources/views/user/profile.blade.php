@@ -33,9 +33,10 @@
                     <input type="password" class="form-control" name="confirm_password">
                 </div>
 
-                <button type="button" class="btn btn-default" data-dismiss="modal">Annulla</button>
+                <a class="btn btn-default" href="{{ url('home') }}">Annulla</a>
                 <button type="submit" class="btn btn-primary">Salva</button>
             </form>
         </div>
     </div>
 </div>
+@endsection
