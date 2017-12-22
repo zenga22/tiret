@@ -67,7 +67,8 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
     private function prepareMail($m, $filename, $filepath)
     {
         $m->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
-        $m->to($this->email, $this->name . ' ' . $this->surname)->subject('nuovo documento disponibile: ' . $filename);
+        $m->to($this->email, $this->name . ' ' . $this->surname);
+        $m->subject('nuovo documento disponibile: ' . $filename);
 
         if (empty($this->email2) == false)
             $m->cc($this->email2);
@@ -76,6 +77,9 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 
         if($filepath != null)
             $m->attach($filepath, ['as' => $filename]);
+
+        if(!empty($this->group->email))
+            $m->replyTo($this->group->email);
 
         /*
             Purtroppo non è possibile (o comunque è molto scomodo) intercettare

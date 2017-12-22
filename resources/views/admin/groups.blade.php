@@ -101,6 +101,11 @@
                                 <input type="text" class="form-control" name="names[]" value="{{ $group->name }}">
                             </div>
 
+                            <div class="form-group">
+                                <label for="emails[]">{{ $group->email }}</label>
+                                <input type="text" class="form-control" name="emails[]" value="{{ $group->email }}">
+                            </div>
+
                             @if(env('SEND_MAIL', false) == true)
                             <div class="form-group">
                                 <label for="mailtext[]">Testo mail di notifica assegnazione file</label>

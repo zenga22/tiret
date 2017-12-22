@@ -378,6 +378,7 @@ class AdminController extends Controller
         if ($user->is('admin')) {
             $ids = $request->input('ids');
             $names = $request->input('names');
+            $emails = $request->input('emails');
             $mailtexts = $request->input('mailtext', []);
             $lightmailtexts = $request->input('lightmailtext', []);
             $updatemailtexts = $request->input('updatedmailtext', []);
@@ -393,6 +394,7 @@ class AdminController extends Controller
                 }
                 else {
                     $group->name = trim($names[$i]);
+                    $group->email = trim($emails[$i]);
                     $group->mailtext = isset($mailtexts[$i]) ? $mailtexts[$i] : '';
                     $group->lightmailtext = isset($lightmailtexts[$i]) ? $lightmailtexts[$i] : '';
                     $group->updatedmailtext = isset($updatemailtexts[$i]) ? $updatemailtexts[$i] : '';
