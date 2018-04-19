@@ -10,6 +10,7 @@ use Aws\Sns\MessageValidator;
 use Aws\Sns\Exception\InvalidSnsMessageException;
 
 use App\Mlog;
+use Log;
 
 class MailController extends Controller
 {
