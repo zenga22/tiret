@@ -19,54 +19,70 @@
     @endif
 
     <div class="row">
-        <div class="col-md-12">
-            <input type="text" class="form-control" id="textfilter" autocomplete="off" placeholder="Cerca...">
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-6 my-files">
+        <div class="col-md-9 my-files">
             <h4>I miei documenti</h4>
 
             @if(count($files) == 0)
                 <p class="alert alert-info">Non hai files assegnati</p>
             @else
-                @if(env('GROUPING_RULE', '') != '')
+                @if(config('tiret.grouping_rules') != '')
                     <?php
 
-                        $file_groups = [];
-
-                        foreach($files as $file) {
-                            preg_match(env('GROUPING_RULE'), basename($file), $matches);
-                            if (isset($matches['key']))
-                                $name = $matches['key'];
-                            else
+                    if (function_exists('read_grouping_rules') == false) {
+                        function read_grouping_rules($rules, $files) {
+                            foreach($files as $file) {
                                 $name = 'Altri';
 
-                            if (isset($file_groups[$name]) == false)
-                                $file_groups[$name] = [];
-                            $file_groups[$name][] = $file;
-                        }
+                                preg_match($rules['regexp'], basename($file), $matches);
+                                if (isset($matches['key']))
+                                    if(isset($rules['enforced']) == false || in_array($matches['key'], $rules['enforced']))
+                                        $name = $matches['key'];
 
-                        krsort($file_groups);
+                                if (isset($file_groups[$name]) == false)
+                                    $file_groups[$name] = (object)[
+                                        'type' => 'files',
+                                        'contents' => []
+                                    ];
+
+                                $file_groups[$name]->contents[] = $file;
+                            }
+
+                            if (isset($rules['children'])) {
+                                foreach($file_groups as $name => $sub_files) {
+                                    $file_groups[$name] = (object)[
+                                        'type' => 'groups',
+                                        'contents' => read_grouping_rules($rules['children'], $sub_files->contents)
+                                    ];
+                                }
+                            }
+
+                            if (isset($rules['sorting'])) {
+                                $sorter = $rules['sorting'];
+                                if (isset($rules['sort_direction']) && $rules['sort_direction'] == 'reverse')
+                                    $sorter = array_reverse($sorter);
+
+                                $file_groups = array_replace(array_flip($sorter), $file_groups);
+                                foreach($file_groups as $name => $value)
+                                    if (!is_object($value))
+                                        unset($file_groups[$name]);
+                            }
+                            else {
+                                if (isset($rules['sort_direction']) && $rules['sort_direction'] == 'reverse')
+                                    krsort($file_groups);
+                                else
+                                    ksort($file_groups);
+                            }
+
+                            return $file_groups;
+                        }
+                    }
+
+                    $rules = config('tiret.grouping_rules');
+                    $file_groups = read_grouping_rules($rules, $files);
 
                     ?>
 
-                    <ul class="nav nav-tabs" role="tablist">
-                        <?php $index = 0 ?>
-                        @foreach($file_groups as $name => $files)
-                            <li role="presentation" {!! $index++ == 0 ? 'class="active"' : '' !!}><a href="#{{ $name }}" aria-controls="{{ $name }}" role="tab" data-toggle="tab">{{ $name }}</a></li>
-                        @endforeach
-                    </ul>
-
-                    <div class="tab-content">
-                        <?php $index = 0 ?>
-                        @foreach($file_groups as $name => $files)
-                            <div role="tabpanel" class="tab-pane {{ $index++ == 0 ? 'active' : '' }}" id="{{ $name }}">
-                                @include('generic.fileslist', ['files' => $files, 'user' => $user])
-                            </div>
-                        @endforeach
-                    </div>
+                    @include('user.personallist', ['file_groups' => $file_groups])
                 @else
                     <div class="tab-content">
                         @include('generic.fileslist', ['files' => $files, 'user' => $user])
@@ -74,7 +90,7 @@
                 @endif
             @endif
         </div>
-        <div class="col-md-6 group-files">
+        <div class="col-md-3 group-files">
             @if(count($groupfiles) == 0)
                 <p class="alert alert-info">Il tuo gruppo non ha files assegnati</p>
             @else
