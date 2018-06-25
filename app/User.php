@@ -12,6 +12,7 @@ use Bican\Roles\Contracts\HasRoleAndPermission as HasRoleAndPermissionContract;
 
 use Storage;
 use Mail;
+use Log;
 
 use App\Group;
 use App\Mlog;
@@ -103,23 +104,26 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 
         /*
             Attenzione: SES ha un limite di 10MB per gli allegati.
-            Per scaramanzia, vengono inviati solo quelli sotto i 9MB.
+            Per scaramanzia, vengono inviati solo quelli sotto i 7MB.
             Se superano questa soglia, si invia solo una mail di notifica
         */
-        if ($filesize > 1024 * 1024 * 9) {
-            Mail::send('emails.notify', ['text' => $user->group->lightmailtext], function ($m) use ($user, $filename) {
-                $user->prepareMail($m, $filename, null);
-            });
+        if ($filesize > 1024 * 1024 * 7) {
+            $mailtext = $user->group->lightmailtext;
+            $filepath = null;
         }
         else {
             if ($update)
                 $mailtext = $user->group->updatemailtext;
             else
                 $mailtext = $user->group->mailtext;
-
-            Mail::send('emails.notify', ['text' => $mailtext], function ($m) use ($user, $filepath, $filename) {
-                $user->prepareMail($m, $filename, $filepath);
-            });
         }
+
+        if (empty(trim($mailtext))) {
+            Log::error('Testo della mail vuoto!');
+        }
+
+        Mail::send('emails.notify', ['text' => $mailtext], function ($m) use ($user, $filepath, $filename) {
+            $user->prepareMail($m, $filename, $filepath);
+        });
     }
 }

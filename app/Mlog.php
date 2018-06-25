@@ -98,6 +98,7 @@ class Mlog extends Model
             return;
         }
 
+        Log::debug(sprintf('Aggiorno stato messaggio %d / %s: %s', $actual->id, $actual->filename, $status));
         $actual->status = $status;
         $actual->save();
 
@@ -106,7 +107,11 @@ class Mlog extends Model
         switch($status) {
             case 'sent':
             case 'fail':
-                unlink($filepath);
+                if (file_exists($filepath))
+                    unlink($filepath);
+                else
+                    Log::error('Aggiornamento di messaggio, file non trovato: ' . $filepath);
+
                 break;
 
             case 'reschedule':
