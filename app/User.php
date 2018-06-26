@@ -113,7 +113,7 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         }
         else {
             if ($update)
-                $mailtext = $user->group->updatemailtext;
+                $mailtext = $user->group->updatedmailtext;
             else
                 $mailtext = $user->group->mailtext;
         }
