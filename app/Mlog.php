@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
+use Log;
 use App\Cloud;
 
 class Mlog extends Model
