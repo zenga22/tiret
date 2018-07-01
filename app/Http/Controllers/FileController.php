@@ -47,16 +47,7 @@ class FileController extends Controller
                         abort(403);
 
                     if ($send_mail == true && $target != null) {
-                        Mail::send('emails.notify', ['text' => $target->group->mailtext], function ($m) use ($target, $path, $filename) {
-                            $m->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
-                            $m->to($target->email, $target->name . ' ' . $target->surname)->subject('nuovo documento disponibile: ' . $filename);
-
-                            if (empty($target->email2) == false)
-                                $m->cc($target->email2);
-                            if (empty($target->email3) == false)
-                                $m->cc($target->email3);
-                            $m->attach($path);
-                        });
+                        $target->deliverDocument($path, $filename, false);
                     }
 
                     unlink($path);

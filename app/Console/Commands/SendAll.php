@@ -14,7 +14,7 @@ use App\Cloud;
 class SendAll extends Command
 {
     protected $signature = 'send {users} {message}';
-    protected $description = "Invia una mail agli utenti desiderati con tutti i loro files in allegato. Prevede l'esistenza di un file con l'elenco delle mail utente coinvolte, ed un altro col testo della mail di accompagnamento";
+    protected $description = "Invia una mail agli utenti desiderati. Prevede l'esistenza di un file con l'elenco delle mail utente coinvolte, ed un altro col testo della mail di accompagnamento";
 
     public function __construct()
     {
@@ -38,6 +38,7 @@ class SendAll extends Command
 
         $text = file_get_contents($text_file);
         $mails = file($users_file);
+        $managed = [];
 
         foreach($mails as $m) {
             $m = strtolower(trim($m));
@@ -47,41 +48,29 @@ class SendAll extends Command
             $user = User::where(DB::raw('LOWER(email)'), '=', $m)->first();
 
             if ($user != null) {
-                $files = Cloud::getContents($user->username);
-                $local_files = [];
-
-                foreach($files as $f) {
-                    $filename = basename($f);
-                    $path = sprintf('/tmp/%s', $filename);
-                    $data = Cloud::readFile($user->username, $filename);
-                    file_put_contents($path, $data);
-                    $local_files[] = $path;
-                }
-
-                if (empty($local_files)) {
-                    echo "Nessun file da spedire a " . $m . "\n";
+                if (in_array($user->id, $managed)) {
                     continue;
                 }
 
-                foreach($user->emails as $e) {
-                    try {
-                        Mail::send('emails.empty', ['text' => $user->group->mailtext], function ($m) use ($user, $local_files, $e) {
-                            $m->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
-                            $m->to($e, $user->name . ' ' . $user->surname)->subject('nuovo documento disponibile');
+                $managed[] = $user->id;
 
-                            foreach($local_files as $filepath)
-                                $m->attach($filepath);
-                        });
+                try {
+                    Mail::send('emails.empty', ['text' => $text], function ($m) use ($user, $e) {
+                        $m->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
+                        $m->to($user->email, $user->name . ' ' . $user->surname);
+                        $m->subject('nuovo documento disponibile');
 
-                        echo $m . " - " . $e . ": OK\n";
-                    }
-                    catch (\Exception $ex) {
-                        echo $m . " - " . $e . ": FAILED\n";
-                    }
+                        if (empty($user->email2) == false)
+                            $m->cc($user->email2);
+                        if (empty($user->email3) == false)
+                            $m->cc($user->email3);
+                    });
+
+                    echo $m . " - " . $e . ": OK\n";
                 }
-
-                foreach($local_files as $f)
-                    unlink($f);
+                catch (\Exception $ex) {
+                    echo $m . " - " . $e . ": FAILED\n";
+                }
             }
             else {
                 echo "Utente non trovato per mail " . $m . "\n";

@@ -19,6 +19,7 @@ use Log;
 
 use App\User;
 use App\Group;
+use App\MailText;
 use App\Cloud;
 use App\Rule;
 use App\Tlog;
@@ -379,10 +380,8 @@ class AdminController extends Controller
             $ids = $request->input('ids');
             $names = $request->input('names');
             $emails = $request->input('emails');
-            $mailtexts = $request->input('mailtext', []);
-            $lightmailtexts = $request->input('lightmailtext', []);
-            $updatemailtexts = $request->input('updatedmailtext', []);
             $messages = $request->input('message', []);
+            $signatures = $request->input('signature', []);
 
             for ($i = 0; $i < count($ids); $i++) {
                 $id = $ids[$i];
@@ -395,10 +394,8 @@ class AdminController extends Controller
                 else {
                     $group->name = trim($names[$i]);
                     $group->email = trim($emails[$i]);
-                    $group->mailtext = isset($mailtexts[$i]) ? $mailtexts[$i] : '';
-                    $group->lightmailtext = isset($lightmailtexts[$i]) ? $lightmailtexts[$i] : '';
-                    $group->updatedmailtext = isset($updatemailtexts[$i]) ? $updatemailtexts[$i] : '';
                     $group->message = isset($messages[$i]) ? $messages[$i] : '';
+                    $group->signature = trim($signatures[$i]);
                     $group->save();
                 }
             }
@@ -408,6 +405,50 @@ class AdminController extends Controller
                 $group = new Group();
                 $group->name = $new;
                 $group->save();
+            }
+
+            return redirect(url('admin/groups'));
+        }
+        else {
+            abort(403);
+        }
+    }
+
+    public function postMails(Request $request)
+    {
+        $user = Auth::user();
+
+        if ($user->is('admin')) {
+            $ids = $request->input('text_id');
+            $rules = $request->input('rule');
+            $subjects = $request->input('subject');
+            $plains = $request->input('plain');
+            $lights = $request->input('light');
+            $updates = $request->input('update');
+
+            foreach($ids as $index => $id) {
+                if ($id == 'new') {
+                    $mt = new MailText();
+                }
+                else if ($id == 'default') {
+                    $mt = MailText::where('fallback', true)->first();
+                    if ($mt == null) {
+                        $mt = new MailText();
+                        $mt->fallback = true;
+                    }
+                }
+                else {
+                    $mt = MailText::find($id);
+                    if ($mt == null)
+                        $mt = new MailText();
+                }
+
+                $mt->rule = $rules[$index];
+                $mt->subject = $subjects[$index];
+                $mt->plain = $plains[$index];
+                $mt->light = $lights[$index];
+                $mt->update = $updates[$index];
+                $mt->save();
             }
 
             return redirect(url('admin/groups'));
