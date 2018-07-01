@@ -443,8 +443,14 @@ class AdminController extends Controller
                         $mt = new MailText();
                 }
 
-                $mt->rule = $rules[$index];
-                $mt->subject = $subjects[$index];
+                $mt->rule = trim($rules[$index]);
+                if (empty($mt->rule)) {
+                    if ($mt->exists)
+                        $mt->delete();
+                    continue;
+                }
+
+                $mt->subject = trim($subjects[$index]);
                 $mt->plain = $plains[$index];
                 $mt->light = $lights[$index];
                 $mt->update = $updates[$index];
