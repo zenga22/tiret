@@ -73,7 +73,7 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         $found = false;
         $mailtext = '';
 
-        foreach(MailText::where('fallback', false)->get() as $text) {
+        foreach(MailText::where('group_id', $user->group_id)->where('fallback', false)->get() as $text) {
             if ($text->applies($filename)) {
                 list($filepath, $mailtext) = $text->getMessage($filepath, $update);
                 $found = true;
@@ -82,7 +82,7 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         }
 
         if ($found == false) {
-            $text = MailText::where('fallback', true)->first();
+            $text = MailText::where('group_id', $user->group_id)->where('fallback', true)->first();
             if ($text) {
                 list($filepath, $mailtext) = $text->getMessage($filepath, $update);
             }

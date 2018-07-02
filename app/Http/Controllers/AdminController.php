@@ -419,6 +419,7 @@ class AdminController extends Controller
         $user = Auth::user();
 
         if ($user->is('admin')) {
+            $group_id = $request->input('group_id');
             $ids = $request->input('text_id');
             $rules = $request->input('rule');
             $subjects = $request->input('subject');
@@ -429,18 +430,22 @@ class AdminController extends Controller
             foreach($ids as $index => $id) {
                 if ($id == 'new') {
                     $mt = new MailText();
+                    $mt->group_id = $group_id;
                 }
                 else if ($id == 'default') {
-                    $mt = MailText::where('fallback', true)->first();
+                    $mt = MailText::where('group_id', $group_id)->where('fallback', true)->first();
                     if ($mt == null) {
                         $mt = new MailText();
                         $mt->fallback = true;
+                        $mt->group_id = $group_id;
                     }
                 }
                 else {
                     $mt = MailText::find($id);
-                    if ($mt == null)
+                    if ($mt == null) {
                         $mt = new MailText();
+                        $mt->group_id = $group_id;
+                    }
                 }
 
                 $mt->rule = trim($rules[$index]);
