@@ -14,6 +14,14 @@ class MailText extends Model
             return false;
     }
 
+    public function getSubject($filename)
+    {
+        if (strpos($this->subject, '%s') !== null)
+            return sprintf($this->subject, $filename);
+        else
+            return $this->subject;
+    }
+
     public function getMessage($filepath, $update)
     {
         $filesize = filesize($filepath);

@@ -444,7 +444,7 @@ class AdminController extends Controller
                 }
 
                 $mt->rule = trim($rules[$index]);
-                if (empty($mt->rule)) {
+                if (empty($mt->rule) && $mt->fallback == false) {
                     if ($mt->exists)
                         $mt->delete();
                     continue;
