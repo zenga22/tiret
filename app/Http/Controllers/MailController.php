@@ -49,8 +49,8 @@ class MailController extends Controller
             if ($data->notificationType == 'Delivery') {
                 Mlog::updateStatus($filename, 'sent');
             }
-            else {
-                if (isset($data->bounce)) {
+            else if ($data->notificationType == 'Bounce') {
+                try {
                     $address = $data->bounce->bouncedRecipients[0]->emailAddress;
                     $message = $data->bounce->bouncedRecipients[0]->diagnosticCode;
 
@@ -59,9 +59,14 @@ class MailController extends Controller
                     else
                         Mlog::updateStatus($filename, 'fail');
                 }
-                else {
-                    Log::error('Unrecognized notification from SNS: ' . print_r($data, true));
+                catch(\Exception $e) {
+                    Log::error('Notifica SNS illeggibile: ' . print_r($data, true));
+                    Mlog::updateStatus($filename, 'fail');
                 }
+            }
+            else {
+                Log::error('Notifica SNS tipo non riconosciuto: ' . print_r($data, true));
+                Mlog::updateStatus($filename, 'fail');
             }
         }
     }
