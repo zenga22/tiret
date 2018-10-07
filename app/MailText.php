@@ -22,9 +22,12 @@ class MailText extends Model
             return $this->subject;
     }
 
-    public function getMessage($filepath, $update)
+    public function getMessage($filepaths, $update)
     {
-        $filesize = filesize($filepath);
+        $filesize = 0;
+
+        foreach($filepaths as $filepath)
+            $filesize += filesize($filepath);
 
         /*
             Attenzione: SES ha un limite di 10MB per gli allegati.
@@ -33,7 +36,7 @@ class MailText extends Model
         */
         if ($filesize > 1024 * 1024 * 7) {
             $mailtext = $this->light;
-            $filepath = null;
+            $filepath = [];
         }
         else {
             if ($update)
@@ -42,6 +45,6 @@ class MailText extends Model
                 $mailtext = $this->plain;
         }
 
-        return [$filepath, $mailtext];
+        return [$filepaths, $mailtext];
     }
 }

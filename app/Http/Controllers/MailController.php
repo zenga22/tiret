@@ -46,12 +46,13 @@ class MailController extends Controller
                 return;
             }
 
+            $filename = explode(',', $filename);
+
             if ($data->notificationType == 'Delivery') {
                 Mlog::updateStatus($filename, 'sent');
             }
             else if ($data->notificationType == 'Bounce') {
                 try {
-                    $address = $data->bounce->bouncedRecipients[0]->emailAddress;
                     $message = $data->bounce->bouncedRecipients[0]->diagnosticCode;
 
                     if (strstr($message, 'too busy') !== false)

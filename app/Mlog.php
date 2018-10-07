@@ -73,19 +73,25 @@ class Mlog extends Model
         if (env('TRACK_MAIL_STATUS', false) == false)
             return;
 
-        $actual = Mlog::where('user_id', $user_id)->where('filename', $filename)->first();
-        if ($actual == null) {
-            $actual = new Mlog();
-            $actual->user_id = $user_id;
-            $actual->filename = $filename;
+        if (is_array($filename)) {
+            foreach($filename as $f)
+                self::addStatus($user_id, $f);
         }
+        else {
+            $actual = Mlog::where('user_id', $user_id)->where('filename', $filename)->first();
+            if ($actual == null) {
+                $actual = new Mlog();
+                $actual->user_id = $user_id;
+                $actual->filename = $filename;
+            }
 
-        $actual->status = 'try';
-        $actual->save();
+            $actual->status = 'try';
+            $actual->save();
 
-        $current_path = Mlog::originalFilePath($filename);
-        $archive_path = Mlog::archiveFilePath($filename);
-        copy($current_path, $archive_path);
+            $current_path = Mlog::originalFilePath($filename);
+            $archive_path = Mlog::archiveFilePath($filename);
+            copy($current_path, $archive_path);
+        }
     }
 
     public static function updateStatus($filename, $status)
@@ -93,40 +99,46 @@ class Mlog extends Model
         if (env('TRACK_MAIL_STATUS', false) == false)
             return;
 
-        $actual = Mlog::where('filename', $filename)->first();
-        if ($actual == null) {
-            Log::error('Aggiornamento di messaggio non noto: ' . $message_id);
-            return;
+        if (is_array($filename)) {
+            foreach($filename as $f)
+                self::updateStatus($f, $status);
         }
+        else {
+            $actual = Mlog::where('filename', $filename)->first();
+            if ($actual == null) {
+                Log::error('Aggiornamento di messaggio non noto: ' . $message_id);
+                return;
+            }
 
-        Log::debug(sprintf('Aggiorno stato messaggio %d / %s: %s', $actual->id, $actual->filename, $status));
-        $actual->status = $status;
-        $actual->save();
+            Log::debug(sprintf('Aggiorno stato messaggio %d / %s: %s', $actual->id, $actual->filename, $status));
+            $actual->status = $status;
+            $actual->save();
 
-        $filepath = Mlog::archiveFilePath($actual->filename);
+            $filepath = Mlog::archiveFilePath($actual->filename);
 
-        switch($status) {
-            case 'sent':
-            case 'fail':
-                if (file_exists($filepath))
-                    unlink($filepath);
-                else
-                    Log::error('Aggiornamento di messaggio, file non trovato: ' . $filepath);
+            switch($status) {
+                case 'sent':
+                case 'fail':
+                    if (file_exists($filepath))
+                        unlink($filepath);
+                    else
+                        Log::error('Aggiornamento di messaggio, file non trovato: ' . $filepath);
 
-                break;
+                    break;
 
-            case 'reschedule':
-                /*
-                    Se è già stata caricata un'altra copia del file, quello
-                    precedente viene eliminato
-                */
-                $original = Mlog::originalFilePath($actual->filename);
-                if (file_exists($original))
-                    unlink($filepath);
-                else
-                    rename($filepath, $original);
+                case 'reschedule':
+                    /*
+                        Se è già stata caricata un'altra copia del file, quello
+                        precedente viene eliminato
+                    */
+                    $original = Mlog::originalFilePath($actual->filename);
+                    if (file_exists($original))
+                        unlink($filepath);
+                    else
+                        rename($filepath, $original);
 
-                break;
+                    break;
+            }
         }
     }
 }

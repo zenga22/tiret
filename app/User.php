@@ -65,26 +65,31 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         return false;
     }
 
-    public function deliverDocument($filepath, $filename, $update)
+    public function deliverDocument($filepaths, $filenames, $update)
     {
         $user = $this;
 
-        Mlog::addStatus($this->id, $filename);
+        Mlog::addStatus($this->id, $filenames);
         $found = false;
         $mailtext = '';
 
         foreach(MailText::where('group_id', $user->group_id)->where('fallback', false)->get() as $text) {
-            if ($text->applies($filename)) {
-                list($filepath, $mailtext) = $text->getMessage($filepath, $update);
-                $found = true;
-                break;
+            foreach($filenames as $filename) {
+                if ($text->applies($filename)) {
+                    list($filepaths, $mailtext) = $text->getMessage($filepaths, $update);
+                    $found = true;
+                    break;
+                }
             }
+
+            if ($found)
+                break;
         }
 
         if ($found == false) {
             $text = MailText::where('group_id', $user->group_id)->where('fallback', true)->first();
             if ($text) {
-                list($filepath, $mailtext) = $text->getMessage($filepath, $update);
+                list($filepaths, $mailtext) = $text->getMessage($filepaths, $update);
             }
             else {
                 Log::error('Testo mail di default non definito!');
@@ -97,18 +102,18 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 
         $mailtext .= "\n\n" . $user->group->signature;
 
-        Mail::send('emails.notify', ['text' => $mailtext], function ($m) use ($user, $text, $filepath, $filename) {
+        Mail::send('emails.notify', ['text' => $mailtext], function ($m) use ($user, $text, $filepaths, $filenames) {
             $m->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
             $m->to($user->email, $user->name . ' ' . $user->surname);
-            $m->subject($text ? $text->getSubject($filename) : '');
+            $m->subject($text ? $text->getSubject($filenames[0]) : '');
 
             if (empty($user->email2) == false)
                 $m->cc($user->email2);
             if (empty($user->email3) == false)
                 $m->cc($user->email3);
 
-            if($filepath != null)
-                $m->attach($filepath, ['as' => $filename]);
+            foreach($filepaths as $index => $filepath)
+                $m->attach($filepath, ['as' => $filenames[$index]]);
 
             if(!empty($user->group->email))
                 $m->replyTo($user->group->email);
@@ -121,7 +126,7 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
                 trattato, per poter identificare e trattare la risposta.
                 https://laracasts.com/discuss/channels/laravel/mail-and-the-message-id
             */
-            $m->getSwiftMessage()->getHeaders()->addTextHeader('X-Tiret-Filename', $filename);
+            $m->getSwiftMessage()->getHeaders()->addTextHeader('X-Tiret-Filename', join(',', $filenames));
         });
     }
 }

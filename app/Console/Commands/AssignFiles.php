@@ -48,6 +48,11 @@ class AssignFiles extends Command
         $notfound_counter = 0;
         $overwrite_counter = 0;
         $errors_counter = 0;
+        $info = [];
+
+        /*
+            Raggruppo i files per destinatario...
+        */
 
         foreach($files as $file) {
             try {
@@ -64,81 +69,116 @@ class AssignFiles extends Command
                     $target = $rule->apply($file);
                     if ($target != false) {
                         list($folder, $filename) = $target;
-                        $filepath = $storagePath . $file;
 
-                        $test = Cloud::testExistance($folder . '/' . $filename);
-                        if ($test !== false) {
-                            Tlog::write('files', 'File ' . $test . ' già caricato, sovrascrivo');
+                        if (!isset($info[$folder]))
+                            $info[$folder] = [];
 
-                            if ($this->dry_run == false) {
-                                Cloud::deleteFile($folder, basename($test));
-                                Cloud::loadFile($filepath, $folder, $filename);
-                                $overwrite_counter++;
-                            }
-
-                            if(env('SEND_MAIL', false) == true) {
-                                $user = User::where('username', '=', $folder)->first();
-                                if ($user != null && $user->group != null) {
-                                    $user->deliverDocument($filepath, $filename, true);
-                                }
-                            }
-                        }
-                        else {
-                            if ($this->dry_run == false)
-                                Cloud::loadFile($filepath, $folder, $filename);
-
-                            if(env('SEND_MAIL', false) == true) {
-                                $user = User::where('username', '=', $folder)->first();
-
-                                if ($user != null) {
-                                    if ($user->group != null) {
-                                        if ($this->dry_run == false) {
-                                            $user->deliverDocument($filepath, $filename, false);
-                                            $sent_counter++;
-                                        }
-
-                                        Tlog::write('files', 'Mail inviata a ' . join(', ', $user->emails));
-                                    }
-                                    else {
-                                        Tlog::write('files', 'Utente ' . $user->username . ' esistente ma anagrafica non popolata');
-                                    }
-                                }
-                                else {
-                                    if ($this->dry_run == false) {
-                                        $user = new User();
-                                        $user->name = '???';
-                                        $user->surname = '???';
-                                        $user->username = $folder;
-                                        $user->group_id = 0;
-                                        $user->save();
-
-                                        $notfound_counter++;
-                                    }
-
-                                    Tlog::write('files', 'Creato nuovo utente ' . $user->username . ', necessario popolare l\'anagrafica e notificare account');
-                                }
-                            }
-                        }
-
-                        if ($this->dry_run == false)
-                            $disk->delete($file);
-
-                        Tlog::write('files', 'Caricato ' . $file . ' in ' . $folder);
-
-                        break;
+                        $info[$folder][] = (object) [
+                            'filename' => $filename,
+                            'file' => $file
+                        ];
                     }
                 }
-
-                if ($disk->exists($file))
-                    Tlog::write('files', 'File ' . $file . ' non gestito');
             }
             catch(\Exception $e) {
                 Tlog::write('files', 'Errore nella manipolazione del file ' . $file . ': ' . $e->getMessage());
                 $errors_counter++;
             }
+        }
 
-            if ($this->dry_run == false)
-                usleep(1000000);
+        foreach($info as $folder => $files) {
+            /*
+                ... li salvo su S3...
+            */
+
+            $overwriting = false;
+            $remove_all = false;
+            $filepaths = [];
+            $filenames = [];
+
+            try {
+                foreach($files as $f) {
+                    $filename = $f->filename;
+                    $file = $f->file;
+
+                    $filepath = $storagePath . $file;
+
+                    $filepaths[] = $filepath;
+                    $filenames[] = $filename;
+
+                    $test = Cloud::testExistance($folder . '/' . $filename);
+                    if ($test !== false) {
+                        Tlog::write('files', 'File ' . $test . ' già caricato, sovrascrivo');
+
+                        if ($this->dry_run == false) {
+                            Cloud::deleteFile($folder, basename($test));
+                            $overwrite_counter++;
+                        }
+
+                        $overwriting = true;
+                    }
+
+                    if ($this->dry_run == false) {
+                        Cloud::loadFile($filepath, $folder, $filename);
+                    }
+
+                    Tlog::write('files', 'Caricato ' . $file . ' in ' . $folder);
+                }
+            }
+            catch(\Exception $e) {
+                Tlog::write('files', 'Errore in caricamento files: ' . $e->getMessage());
+            }
+
+            /*
+                ... e invio mail di notifica agli utenti
+            */
+
+            if(env('SEND_MAIL', false) == true) {
+                try {
+                    if (!empty($filepaths)) {
+                        $user = User::where('username', '=', $folder)->first();
+
+                        if ($user != null) {
+                            if ($user->group != null) {
+                                if ($this->dry_run == false) {
+                                    $user->deliverDocument($filepaths, $filenames, $overwriting);
+                                    $remove_all = true;
+                                    $sent_counter += count($filepaths);
+                                    usleep(1000000);
+                                }
+
+                                Tlog::write('files', 'Mail inviata a ' . join(', ', $user->emails));
+                            }
+                            else {
+                                Tlog::write('files', 'Utente ' . $user->username . ' esistente ma anagrafica non popolata');
+                            }
+                        }
+                        else {
+                            if ($this->dry_run == false) {
+                                $user = new User();
+                                $user->name = '???';
+                                $user->surname = '???';
+                                $user->username = $folder;
+                                $user->group_id = 0;
+                                $user->save();
+
+                                $notfound_counter++;
+                            }
+
+                            Tlog::write('files', 'Creato nuovo utente ' . $user->username . ', necessario popolare l\'anagrafica e notificare account');
+                        }
+                    }
+                }
+                catch(\Exception $e) {
+                    Tlog::write('files', 'Errore in invio mail di notifica: ' . $e->getMessage());
+                }
+            }
+
+            if ($remove_all) {
+                foreach($files as $f) {
+                    $disk->delete($f->file);
+                }
+            }
         }
 
         if (!empty(env('ADMIN_NOTIFY_MAIL', '')) && $this->dry_run == false) {
