@@ -15,15 +15,33 @@ class Cloud {
         $files = $disk->files($folder);
 
         if ($sort == true) {
+            /*
+                Attenzione: più files possono avere la stessa data di ultima
+                modifica (se sono stati caricati a breve intervallo uno
+                dall'altro)
+            */
+
             $sorting = [];
 
             foreach($files as $file) {
                 $date = $disk->lastModified($file);
-                $sorting[$date] = $file;
+                if (!isset($sorting[$date])) {
+                    $sorting[$date] = [];
+                }
+
+                $sorting[$date][] = $file;
             }
 
             krsort($sorting);
-            return $sorting;
+
+            $final = [];
+
+            foreach($sorting as $s) {
+                foreach($s as $f)
+                    $final[] = $f;
+            }
+
+            return $final;
         }
         else {
             return $files;
