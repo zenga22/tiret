@@ -13,6 +13,7 @@ use App\User;
 use App\Group;
 use App\Document;
 use App\Cloud;
+use App\Tlog;
 
 class FileController extends Controller
 {
@@ -113,6 +114,7 @@ class FileController extends Controller
 
         if ($user->is('admin|groupadmin') && $user->testAccess($folder)) {
             Cloud::deleteFile($folder, $filename);
+            Tlog::write('files', 'File ' . $filename . ' rimosso manualmente');
             return redirect(url('admin'));
         }
         else {
