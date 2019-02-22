@@ -39,7 +39,7 @@ class FileController extends Controller
                         $target = Group::findOrFail($request->input('group_id'));
                         $folder = $target->name;
                         $ret = redirect(url('admin/groups/'));
-                        $send_mail = $request->has('send_mail');
+                        $send_mail = $request->has('send_mail') && env('SEND_MAIL', false);
                     }
 
                     if ($user->testAccess($folder))

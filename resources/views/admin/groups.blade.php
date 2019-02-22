@@ -65,11 +65,13 @@
                         <input type="file" class="form-control" name="file">
                     </div>
 
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" name="send_mail"> Notifica via mail a tutti gli utenti del gruppo
-                        </label>
-                    </div>
+                    @if(env('SEND_MAIL', false))
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="send_mail"> Notifica via mail a tutti gli utenti del gruppo
+                            </label>
+                        </div>
+                    @endif
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Annulla</button>
