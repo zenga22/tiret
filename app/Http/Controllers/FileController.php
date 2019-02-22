@@ -36,10 +36,10 @@ class FileController extends Controller
                         $send_mail = env('SEND_MAIL', false);
                     }
                     else if ($request->has('group_id')) {
-                        $group = Group::findOrFail($request->input('group_id'));
-                        $folder = $group->name;
+                        $target = Group::findOrFail($request->input('group_id'));
+                        $folder = $target->name;
                         $ret = redirect(url('admin/groups/'));
-                        $send_mail = false;
+                        $send_mail = $request->has('send_mail');
                     }
 
                     if ($user->testAccess($folder))

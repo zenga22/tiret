@@ -64,6 +64,12 @@
                         <label for="file">File</label>
                         <input type="file" class="form-control" name="file">
                     </div>
+
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="send_mail"> Notifica via mail a tutti gli utenti del gruppo
+                        </label>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Annulla</button>
