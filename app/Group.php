@@ -13,6 +13,7 @@ class Group extends Model
     public function deliverDocument($filepaths, $filenames, $update) {
         foreach($this->users as $user) {
             $user->deliverDocument($filepaths, $filenames, $update);
+            usleep(100000);
         }
     }
 }

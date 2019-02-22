@@ -67,6 +67,11 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 
     public function deliverDocument($filepaths, $filenames, $update)
     {
+        if (is_string($filepaths) && is_string($filenames)) {
+            $filepaths = [$filepaths];
+            $filenames = [$filenames];
+        }
+
         $user = $this;
 
         Mlog::addStatus($this->id, $filenames);
