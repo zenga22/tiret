@@ -36,7 +36,7 @@ class MailText extends Model
         */
         if ($filesize > 1024 * 1024 * 7) {
             $mailtext = $this->light;
-            $filepath = [];
+            $filepaths = [];
         }
         else {
             if ($update)
