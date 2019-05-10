@@ -12,4 +12,13 @@ class VerifyCsrfToken extends BaseVerifier
         */
         '/mail/status'
     ];
+
+    public function handle($request, Closure $next)
+    {
+        if ($this->isReading($request) || $this->shouldPassThrough($request) || $this->tokensMatch($request)) {
+            return $this->addCookieToResponse($request, $next($request));
+        }
+
+        return redirect('/home');
+    }
 }

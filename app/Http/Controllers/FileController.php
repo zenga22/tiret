@@ -84,6 +84,9 @@ class FileController extends Controller
         }
 
         $user = Auth::user();
+        if (is_null($user)) {
+            abort(403);
+        }
 
         if ($user->testAccess($folder) == true) {
             $path = Cloud::localPark($folder, $filename);

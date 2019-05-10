@@ -33,12 +33,18 @@ class MailController extends Controller
         else if ($message['Type'] === 'Notification') {
             $data = json_decode($message['Message']);
 
-            $filename = null;
-            foreach($data->mail->headers as $header) {
-                if ($header->name == 'X-Tiret-Filename') {
-                    $filename = $header->value;
-                    break;
+            try {
+                $filename = null;
+                foreach($data->mail->headers as $header) {
+                    if ($header->name == 'X-Tiret-Filename') {
+                        $filename = $header->value;
+                        break;
+                    }
                 }
+            }
+            catch(\Exception $e) {
+                Log::error('Notifica SNS con headers non riconosciuti: ' . print_r($data, true));
+                return;
             }
 
             if ($filename == null) {
