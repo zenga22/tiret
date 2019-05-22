@@ -89,8 +89,10 @@ class Mlog extends Model
             $actual->save();
 
             $current_path = Mlog::originalFilePath($filename);
-            $archive_path = Mlog::archiveFilePath($filename);
-            copy($current_path, $archive_path);
+            if (file_exists($current_path)) {
+                $archive_path = Mlog::archiveFilePath($filename);
+                copy($current_path, $archive_path);
+            }
         }
     }
 
