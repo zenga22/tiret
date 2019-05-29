@@ -8,6 +8,16 @@
 </ol>
 
 <div class="container-fluid">
+    @if(Session::has('message'))
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert alert-info">
+                    {{ Session::get('message') }}
+                </div>
+            </div>
+        </div>
+    @endif
+
     @if($show_menu)
         <div class="row">
             <div class="col-md-12 text-center">
@@ -37,34 +47,67 @@
 
         <div class="row">
             <div class="col-md-12 contents">
-                <div class="row">
-                    <div class="col-md-12">
-                        <input type="text" class="form-control" id="textfilter" autocomplete="off" placeholder="Cerca...">
-                    </div>
-                </div>
-                <table class="table filteratable">
-                    @if($section == 'mail')
-                        <thead>
-                            <tr>
-                                <th width="10%">Data</th>
-                                <th width="20%">Utente</th>
-                                <th width="30%">Mail</th>
-                                <th width="30%">Documento</th>
-                                <th width="10%">Stato</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($logs as $log)
+                @if($section == 'mail')
+                    <form method="POST" action="{{ url('admin/resend') }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <input type="text" class="form-control" id="textfilter" autocomplete="off" placeholder="Cerca...">
+
+                                <div class="btn-group" data-toggle="buttons" id="buttonfilter" data-filter-attribute="status">
+                                    <label class="btn btn-primary active">
+                                        <input type="radio" name="filter" value="all" autocomplete="off" checked> Tutti
+                                    </label>
+                                    <label class="btn btn-primary">
+                                        <input type="radio" name="filter" value="try" autocomplete="off"> In Attesa
+                                    </label>
+                                    <label class="btn btn-primary">
+                                        <input type="radio" name="filter" value="sent" autocomplete="off"> Inviata
+                                    </label>
+                                    <label class="btn btn-primary">
+                                        <input type="radio" name="filter" value="fail" autocomplete="off"> Fallita
+                                    </label>
+                                    <label class="btn btn-primary">
+                                        <input type="radio" name="filter" value="reschedule" autocomplete="off"> Riprovare
+                                    </label>
+                                </div>
+
+                                <button type="submit" class="btn btn-default">Reinoltra mail selezionate</button>
+                            </div>
+                        </div>
+                        <table class="table filteratable">
+                            <thead>
                                 <tr>
-                                    <td>{{ $log->created_at }}</td>
-                                    <td>{{ $log->user->username }}</td>
-                                    <td>{{ join(', ', $log->user->emails) }}</td>
-                                    <td>{{ $log->filename }}</td>
-                                    <td>{!! $log->description !!}</td>
+                                    <th width="5%"></th>
+                                    <th width="10%">Data</th>
+                                    <th width="15%">Utente</th>
+                                    <th width="30%">Mail</th>
+                                    <th width="30%">Documento</th>
+                                    <th width="10%">Stato</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    @else
+                            </thead>
+                            <tbody>
+                                @foreach($logs as $log)
+                                    <tr data-filter-status="{{ $log->status }}">
+                                        <td><input type="checkbox" name="resend[]" value="{{ $log->id }}"></td>
+                                        <td>{{ $log->created_at }}</td>
+                                        <td>{{ $log->user->username }}</td>
+                                        <td>{{ join(', ', $log->user->emails) }}</td>
+                                        <td>{{ $log->filename }}</td>
+                                        <td>{!! $log->description !!}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </form>
+                @else
+                    <div class="row">
+                        <div class="col-md-12">
+                            <input type="text" class="form-control" id="textfilter" autocomplete="off" placeholder="Cerca...">
+                        </div>
+                    </div>
+                    <table class="table filteratable">
                         <thead>
                             <tr>
                                 <th width="10%">Data</th>
@@ -79,8 +122,8 @@
                                 </tr>
                             @endforeach
                         </tbody>
-                    @endif
-                </table>
+                    </table>
+                @endif
             </div>
         </div>
     @endif

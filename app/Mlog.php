@@ -143,4 +143,10 @@ class Mlog extends Model
             }
         }
     }
+
+    public function copyFileBack()
+    {
+        $original = Mlog::originalFilePath($this->filename);
+        Cloud::localPark($this->user->username, $this->filename, $original);
+    }
 }

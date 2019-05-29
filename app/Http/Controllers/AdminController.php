@@ -602,6 +602,19 @@ class AdminController extends Controller
         return Theme::view('admin.reports', $data);
     }
 
+    public function postResend(Request $request)
+    {
+        $resend = $request->input('resend', []);
+        $logs = Mlog::whereIn('id', $resend)->get();
+
+        foreach($logs as $l) {
+            $l->copyFileBack();
+        }
+
+        Session::flash('message', "I documenti selezionati sono stati rischedulati per l'invio");
+        return redirect(url('admin/reports?section=mail'));
+    }
+
     public function getCount(Request $request, $folder)
     {
         $files = Cloud::getContents($folder, false);

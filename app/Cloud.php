@@ -73,10 +73,13 @@ class Cloud {
         return $disk->get($folder . '/' . $filename);
     }
 
-    public static function localPark($folder, $filename)
+    public static function localPark($folder, $filename, $path = null)
     {
         $contents = Cloud::readFile($folder, $filename);
-        $path = tempnam(sys_get_temp_dir(), 'download');
+
+        if (is_null($path))
+            $path = tempnam(sys_get_temp_dir(), 'download');
+
         file_put_contents($path, $contents);
         return $path;
     }

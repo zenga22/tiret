@@ -24,6 +24,22 @@ $(document).ready(function() {
         }
     });
 
+    $('#buttonfilter input[type=radio]').change({
+        if ($(this).prop('checked') == false)
+            return;
+
+        var t = $(this).val();
+        var name = $('#buttonfilter').attr('data-filter-attribute');
+
+        if (t == '') {
+            $('.filteratable tbody tr').show();
+        }
+        else {
+            $('.filteratable tbody tr[data-filter-' + name + '=' + t + ']').show();
+            $('.filteratable tbody tr[data-filter-' + name + '!=' + t + ']').hide();
+        }
+    });
+
     var index = 0;
     var tot = $('.waiting-count').length;
 
