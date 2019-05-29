@@ -56,8 +56,8 @@
                                 <input type="text" class="form-control" id="textfilter" autocomplete="off" placeholder="Cerca...">
 
                                 <div class="btn-group" data-toggle="buttons" id="buttonfilter" data-filter-attribute="status">
-                                    <label class="btn btn-primary active">
-                                        <input type="radio" name="filter" value="all" autocomplete="off" checked> Tutti
+                                    <label class="btn btn-primary">
+                                        <input type="radio" name="filter" value="all" autocomplete="off"> Tutti
                                     </label>
                                     <label class="btn btn-primary">
                                         <input type="radio" name="filter" value="try" autocomplete="off"> In Attesa

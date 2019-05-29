@@ -24,14 +24,14 @@ $(document).ready(function() {
         }
     });
 
-    $('#buttonfilter input[type=radio]').change({
+    $('#buttonfilter input[type=radio]').change(function() {
         if ($(this).prop('checked') == false)
             return;
 
         var t = $(this).val();
         var name = $('#buttonfilter').attr('data-filter-attribute');
 
-        if (t == '') {
+        if (t == 'all') {
             $('.filteratable tbody tr').show();
         }
         else {
