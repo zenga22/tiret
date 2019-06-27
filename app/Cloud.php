@@ -33,7 +33,7 @@ class Cloud {
                     else
                         $date = '9999999-' . str_random(5);
 
-                    $sorting[$pattern][] = $file;
+                    $sorting[$date][] = $file;
                 }
             }
             else {
