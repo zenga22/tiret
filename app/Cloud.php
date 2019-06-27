@@ -23,13 +23,28 @@ class Cloud {
 
             $sorting = [];
 
-            foreach($files as $file) {
-                $date = $disk->lastModified($file);
-                if (!isset($sorting[$date])) {
-                    $sorting[$date] = [];
-                }
+            $sorting_rule = env('SORTING_RULE', '');
+            if (!empty($sorting_rule)) {
+                foreach($files as $file) {
+                    preg_match($sorting_rule, $file, $matches);
 
-                $sorting[$date][] = $file;
+                    if (!empty($matches))
+                        $date = sprintf('%s-%s-%s', $matches['year'], $matches['month'], $matches['day']);
+                    else
+                        $date = '9999999-' . str_random(5);
+
+                    $sorting[$pattern][] = $file;
+                }
+            }
+            else {
+                foreach($files as $file) {
+                    $date = $disk->lastModified($file);
+                    if (!isset($sorting[$date])) {
+                        $sorting[$date] = [];
+                    }
+
+                    $sorting[$date][] = $file;
+                }
             }
 
             krsort($sorting);
