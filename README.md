@@ -1,98 +1,97 @@
-## Tiret
 
-**Tiret** è un semplice frontend per il servizio di storage Amazon S3, pensato per esporre grandi
-quantità di files ad un gran numero di utenti.
+**Tiret** is a simple frontend for the Amazon S3 storage service, designed to expose large
+quantity of files to a large number of users.
 
 # Features
 
-* utenti divisi in gruppi
-* ruoli possibili: amministratore generale, amministratore di gruppo ed utente
-* cartelle private per gli utenti e cartelle comuni per i gruppi
-* solo gli amministratori possono creare e rimuovere files
-* auto-assegnazione dei files caricati in base al loro nome
-* tracciamente stato delle mail inviate
-* importazione degli utenti da file CSV
-* possibilità di customizzazione del tema grafico
+* users divided into groups
+* possible roles: general administrator, group administrator and user
+* private folders for users and common folders for groups
+* only administrators can create and remove files
+* auto-assignment of uploaded files based on their name
+* tracking status of sent emails
+* importing users from CSV files
+* possibility of customizing the graphic theme
 
-# Requisiti
+# Requirements
 
 * PHP >= 5.5.9
 * composer ( https://getcomposer.org/ )
-* un account AWS ( http://aws.amazon.com/ )
-* un webserver ed un database
+* an account AWS ( http://aws.amazon.com/ )
+* a webserver and a database
 
-# Installazione
+# Installation
 
 ```
-git clone https://github.com/OfficineDigitali/tiret
+git clone https://github.com/zenga/tiret
 cd tiret
 composer install
 cp .env.example .env
-(editare .env con i propri parametri di accesso al database, a S3 e all'SMTP)
+(edit .env with your database, S3 and SMTP access parameters)
 php artisan migrate
 php artisan db:seed
 php artisan key:generate
 ```
 
-Le credenziali di default sono username: admin, password: cippalippa
+The default credentials are username: admin, password: cippalippa
 
-# Auto-Assegnazione
+# Auto-Assignment
 
-È possibile fare in modo che i files arbitrariamente caricati in _storage/app_ vengano assegnati
-ad utenti o gruppi in funzione del loro nome. Dal pannello "_Regole Assegnazione_" si specificano
-le proprie regular expressions, con cui estrarre il nome della cartella di destinazione.
+You can make sure that files arbitrarily uploaded to _storage / app_ are assigned
+to users or groups according to their name. From the panel "_Assignment Rules_" are specified
+your regular expressions, with which to extract the name of the destination folder.
 
-È necessario abilitare lo scheduler interno a Laravel affinché la routine di assegnazione venga
-eseguita: per far ciò, eseguire per mezzo di cron il comando `php artisan schedule:run` ogni
-minuto.
+Laravel's internal scheduler must be enabled for the assignment routine to come
+executed: to do this, use the cron command `php artisan schedule: run` every
+minute.
 
-Definendo in `.env` il parametro `ADMIN_NOTIFY_MAIL=esempio@test.com`, l'indirizzo mail definito
-riceverà un breve report sullo stato delle attività di assegnazione.
+By defining the `ADMIN_NOTIFY_MAIL = example @ test.com` parameter in` .env`, the defined email address
+will receive a short report on the status of assignment activities.
 
-# Tracciamento Mail
+# Mail tracking
 
-Se le mail vengono inoltrate per mezzo di Amazon SES, è possibile registrare un topic SNS e
-sottoscriverlo all'URL `http://miodominio.com/mail/status` per tracciare lo stato dei messaggi in
-uscita.
+If emails are forwarded via Amazon SES, an SNS topic can be registered
+subscribe to the URL `http: // mydomain.com / mail / status` to track the status of messages in
+Exit.
 
-Una volta definito in `.env` il parametro `TRACK_MAIL_STATUS=true` il sistema provvederà a
-mantenere lo storico delle mail gestite, ed in alcuni casi sarà in grado di tentare un nuovo
-inoltro in caso di mancato successo.
+Once the `TRACK_MAIL_STATUS = true` parameter is defined in` .env`, the system will
+keep the history of the emails managed, and in some cases will be able to try a new one
+forwarding if unsuccessful.
 
 # Plugins
 
-Viene fornito un semplice meccanismo per implementare funzionalità custom all'interno della
-applicazione, per maggiori dettagli si veda l'esempio in app/Plugins/SampleFileHandler.php
+A simple mechanism is provided to implement custom functionality within the
+application, for more details see the example in app / Plugins / SampleFileHandler.php
 
-Gli eventi sinora esistenti, per i quali i plugins possono registrarsi, sono:
+The events that have existed so far, for which plugins can register, are:
 
-* *FileToHandle*: lanciato dal comando di auto-assegnazione dei files, permette di intercettare
-files speciali e trattarli separatamente. Si consiglia di eliminare o spostare il file eventualmente
-processato dalla cartella destinata agli uploads.
+** FileToHandle **: launched by the file auto-assignment command, it allows you to intercept
+special files and treat them separately. We recommend that you delete or move the file if necessary
+processed by the folder intended for uploads.
 
-# Temi
+# Themes
 
-L'aspetto grafico di **Tiret** è volutamente semplice e limitato, per permettere una facile
-personalizzazione ed un facile adattamento al look'n'feel di siti esistenti.
+The graphic aspect of ** Tiret ** is deliberately simple and limited, to allow for easy
+customization and easy adaptation to the look'n'feel of existing sites.
 
-Per personalizzare l'aspetto grafico è possibile creare un nuovo file in
-_public/themes/nome_del_tema/views/app.blade.php_, contenente il proprio template di base
-all'interno del quale il contenuto della pagina sarà iniettato. Si prenda come esempio il file
-_resources/views/app.blade.php_.
+To customize the look and feel you can create a new file in
+_public / themes / name_of_theme / views / app.blade.php_, containing your own base template
+inside which the content of the page will be injected. Take the file as an example
+_resources / views / app.blade.php_.
 
-Una volta creato il tema, è possibile attivarlo modificando la relativa configurazione in
-_config/themes.php_
+Once the theme has been created, you can activate it by changing its configuration in
+_config / themes.php_
 
-# Storia
+# History
 
-**Tiret** è stato inizialmente sviluppato per una agenzia di assistenza fiscale con la necessità
-di distribuire ed esporre ai propri 6000+ clienti documenti sulle buste paga, per un totale di
-svariati gigabytes al mese.
+** Tiret ** was initially developed for a tax assistance agency with the need
+to distribute and display payroll documents to their 6000+ customers, for a total of
+several gigabytes per month.
 
-Il nome _tirét_ in piemontese sta per _cassetto_.
+The Piedmontese name _tirét_ stands for _drawer_.
 
-# Licenza
+# License
 
-**Tiret** è distribuito in licenza AGPLv3.
+** Tiret ** is distributed under AGPLv3 license.
 
 Copyright (C) 2015 Officine Digitali <info@officinedigitali.org>.
